@@ -1,0 +1,7 @@
+{
+  "name": "scrum-store",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
