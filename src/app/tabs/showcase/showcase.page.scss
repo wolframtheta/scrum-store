@@ -1,0 +1,860 @@
+// ============================================
+// HEADER STYLES
+// ============================================
+.header-toolbar {
+  --background: var(--ion-color-primary);
+  --color: white;
+  --border-width: 0;
+
+  .header-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    ion-icon {
+      font-size: 1.75rem;
+    }
+  }
+}
+
+// ============================================
+// SEARCH TOOLBAR
+// ============================================
+.search-toolbar {
+  --background: var(--ion-color-primary);
+  --border-width: 0;
+  padding: 0 0.75rem 0.75rem 0.75rem;
+
+  .search-bar {
+    --background: rgba(255, 255, 255, 0.2);
+    --color: white;
+    --placeholder-color: rgba(255, 255, 255, 0.8);
+    --icon-color: rgba(255, 255, 255, 0.9);
+    --border-radius: 16px;
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+  }
+}
+
+// ============================================
+// FILTERS TOOLBAR
+// ============================================
+.filters-toolbar {
+  --background: var(--ion-color-primary);
+  --border-width: 0;
+  padding: 0 0 0.75rem 0;
+
+  .filters-container {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0 0.75rem;
+
+    // Container for filters chip + clear button
+    .filters-chip-container {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      position: relative;
+    }
+
+    // Clear filters button (red X)
+    .clear-filters-button {
+      --background: var(--ion-color-danger);
+      --background-hover: var(--ion-color-danger-shade);
+      --color: white;
+      --padding-start: 0;
+      --padding-end: 0;
+      --border-radius: 50%;
+      --ripple-color: transparent;
+      --box-shadow: none;
+      height: 34px;
+      width: 34px;
+      margin: 0;
+
+      ion-icon {
+        font-size: 1.5rem;
+        color: white;
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      &::part(native) {
+        background: var(--ion-color-danger);
+        color: white;
+        box-shadow: none;
+      }
+    }
+
+    // Filter chips (seasonal, filters)
+    ion-chip {
+      flex-shrink: 0;
+      font-weight: 700;
+      font-size: 0.875rem;
+      height: 34px;
+      margin: 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      // Default style - WHITE with dark text
+      background: white;
+      color: var(--ion-color-dark);
+      border: 2px solid white;
+
+      // Content wrapper for filters chip
+      .filters-chip-content {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      // Icons inside chips
+      ion-icon {
+        font-size: 1.125rem;
+        color: var(--ion-color-dark);
+        margin: 0;
+      }
+
+      // Labels inside chips
+      ion-label {
+        font-weight: 700;
+        color: var(--ion-color-dark);
+        margin: 0;
+      }
+
+      // Badge counter (span element)
+      span {
+        padding-top: 0;
+        padding-bottom: 0;
+        color: var(--ion-color-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        align-self: center;
+      }
+
+      // Medium chip (unselected seasonal)
+      &[color="medium"] {
+        background: white;
+        color: var(--ion-color-dark);
+        border: 2px solid white;
+
+        ion-icon,
+        ion-label {
+          color: var(--ion-color-dark);
+        }
+      }
+
+      // Success chip (selected seasonal)
+      &[color="success"]:not([outline]) {
+        background: var(--ion-color-success);
+        color: white;
+        border: 2px solid var(--ion-color-success);
+
+        ion-icon,
+        ion-label {
+          color: white;
+        }
+      }
+
+      // Primary chip (active filters with badge)
+      &[color="primary"] {
+        background: var(--ion-color-secondary);
+        color: var(--ion-color-dark);
+        border: 2px solid var(--ion-color-secondary);
+
+        ion-icon,
+        ion-label {
+          color: var(--ion-color-dark);
+        }
+      }
+
+      // Danger chip (clear filters - not used now but kept for reference)
+      &[color="danger"] {
+        background: var(--ion-color-danger);
+        color: white;
+        border: 2px solid var(--ion-color-danger);
+
+        ion-icon,
+        ion-label {
+          color: white;
+        }
+      }
+
+      // Active state
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+}
+
+// ============================================
+// FILTERS MODAL
+// ============================================
+.filters-modal-content {
+  --background: white;
+
+  ion-accordion-group {
+    ion-accordion {
+      margin-bottom: 0.5rem;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+      // Category level (top level accordion)
+      .category-header {
+        --background: var(--ion-color-tertiary);
+        --color: white;
+        --padding-start: 1rem;
+        --padding-end: 1rem;
+        --border-width: 0;
+        --inner-border-width: 0;
+        font-weight: 700;
+
+        ion-checkbox {
+          --background: white;
+          --background-checked: var(--ion-color-secondary);
+          --border-color: white;
+          --border-color-checked: var(--ion-color-secondary);
+          --checkmark-color: white;
+          margin-right: 0.75rem;
+        }
+
+        ion-label {
+          color: white;
+          font-size: 1rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+      }
+
+      // Accordion content for categories
+      .accordion-content {
+        padding: 0.5rem 0;
+        background: #f8f9fa;
+
+        // Nested accordion group for products
+        ion-accordion-group {
+          ion-accordion {
+            margin: 0 0.5rem 0.5rem 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+
+            // Product level (second level accordion)
+            .product-header {
+              --background: white;
+              --color: var(--ion-color-dark);
+              --padding-start: 1rem;
+              --padding-end: 1rem;
+              --border-width: 0;
+              --inner-border-width: 0;
+              font-weight: 600;
+
+              ion-checkbox {
+                --background: white;
+                --background-checked: var(--ion-color-secondary);
+                --border-color: var(--ion-color-medium);
+                --border-color-checked: var(--ion-color-secondary);
+                --checkmark-color: white;
+                margin-right: 0.75rem;
+              }
+
+              ion-label {
+                color: var(--ion-color-dark);
+                font-size: 0.95rem;
+                font-weight: 600;
+              }
+            }
+
+            // Varieties content (third level - no accordion)
+            .varieties-content {
+              background: white;
+              padding-left: 1.5rem;
+
+              .variety-item {
+                --background: white;
+                --color: var(--ion-color-dark);
+                --padding-start: 1rem;
+                --padding-end: 1rem;
+                --min-height: 40px;
+                --border-width: 0;
+                --inner-border-width: 0;
+                border-left: 2px solid var(--ion-color-light);
+
+                ion-checkbox {
+                  --background: white;
+                  --background-checked: var(--ion-color-secondary);
+                  --border-color: var(--ion-color-medium);
+                  --border-color-checked: var(--ion-color-secondary);
+                  --checkmark-color: white;
+                  margin-right: 0.75rem;
+                }
+
+                ion-label {
+                  color: var(--ion-color-medium-shade);
+                  font-size: 0.875rem;
+                  font-weight: 500;
+                }
+
+                &:last-child {
+                  border-bottom: none;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Modal footer (apply filters button)
+.modal-footer {
+  --background: white;
+  padding: 1rem;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+
+  ion-button {
+    margin: 0;
+    font-weight: 700;
+    height: 48px;
+
+    ion-icon {
+      // Icon styles for the apply button
+    }
+  }
+}
+
+// ============================================
+// ADD TO CART MODAL (FULL SCREEN)
+// ============================================
+.add-to-cart-modal {
+  --background: var(--ion-color-primary);
+
+  &::part(backdrop) {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  &::part(content) {
+    background: var(--ion-color-primary);
+  }
+
+  // Estilos para el contenido del modal
+  .add-to-cart-content {
+    --background: var(--ion-color-primary);
+  }
+
+  // Footer del modal (igual que filters modal)
+  .modal-footer {
+    --background: white;
+    padding: 1rem;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+
+    ion-button {
+      margin: 0;
+      font-weight: 700;
+      height: 56px;
+      --box-shadow: 0 4px 12px rgba(var(--ion-color-secondary-rgb), 0.4);
+
+      ion-icon {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+
+// ============================================
+// CONTENT AREA
+// ============================================
+.aparador-content {
+  --background: #F7FAFC;
+}
+
+// ============================================
+// LOADING STATE
+// ============================================
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  gap: 1rem;
+
+  ion-spinner {
+    transform: scale(1.5);
+  }
+
+  .loading-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+}
+
+// ============================================
+// EMPTY STATE
+// ============================================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+
+  .empty-icon-wrapper {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(var(--ion-color-secondary-rgb), 0.1) 0%, rgba(var(--ion-color-primary-rgb), 0.1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+
+    .empty-icon {
+      font-size: 4rem;
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .empty-title {
+    color: var(--ion-color-dark);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-description {
+    color: var(--ion-color-medium);
+    font-size: 1rem;
+    line-height: 1.5;
+    max-width: 300px;
+  }
+}
+
+// ============================================
+// ARTICLES GRID
+// ============================================
+.articles-container {
+  padding: 1rem;
+  padding-bottom: 2rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+// ============================================
+// ARTICLE CARD
+// ============================================
+.article-card {
+  margin-bottom: 0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+
+  &:active {
+    transform: translateY(2px);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.16);
+  }
+
+  ion-card-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-height: 280px;
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.25rem;
+
+      .article-category {
+        color: var(--ion-color-primary);
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .seasonal-badge {
+        display: flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.65rem;
+        font-weight: 700;
+        border-radius: 12px;
+
+        ion-icon {
+          font-size: 0.875rem;
+        }
+      }
+    }
+
+    .article-title {
+      color: var(--ion-color-dark);
+      font-size: 1.125rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 2.8rem;
+    }
+
+    .article-variety {
+      color: var(--ion-color-medium);
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin: -0.25rem 0 0 0;
+    }
+
+    .article-info-compact {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      min-height: 3rem;
+      flex: 1;
+
+      .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--ion-color-medium);
+        font-size: 0.8rem;
+
+        ion-icon {
+          font-size: 1rem;
+          color: var(--ion-color-primary);
+          flex-shrink: 0;
+        }
+
+        span {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .article-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+      .price-section {
+        flex: 1;
+
+        .price {
+          color: var(--ion-color-primary);
+          font-size: 1.375rem;
+          font-weight: 800;
+          line-height: 1;
+        }
+      }
+
+      .add-button {
+        --border-radius: 10px;
+        --padding-start: 0;
+        --padding-end: 0;
+        --box-shadow: 0 4px 12px rgba(var(--ion-color-secondary-rgb), 0.3);
+        height: 42px;
+        width: 42px;
+        min-width: 42px;
+        flex-shrink: 0;
+        margin: 0;
+
+        ion-icon {
+          font-size: 1.375rem;
+        }
+
+        &:active {
+          --box-shadow: 0 2px 6px rgba(var(--ion-color-secondary-rgb), 0.4);
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// ANIMATIONS
+// ============================================
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.article-card {
+  animation: fadeInUp 0.4s ease-out;
+  animation-fill-mode: both;
+
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.05}s;
+    }
+  }
+}
+
+// =====================================
+// Add to Cart Modal
+// =====================================
+.add-to-cart-modal {
+  .add-to-cart-content {
+    --background: var(--ion-color-primary);
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+  }
+
+  .article-image-container {
+    width: 100%;
+    height: 200px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    .article-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .article-info {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    .article-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+
+      .article-title-section {
+        flex: 1;
+
+        .article-category {
+          color: var(--ion-color-primary);
+          font-size: 0.75rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+
+        .article-name {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--ion-color-dark);
+          margin: 0.25rem 0;
+        }
+
+        .article-variety {
+          color: var(--ion-color-medium);
+          font-size: 1rem;
+          margin: 0;
+        }
+      }
+
+      .seasonal-badge {
+        padding: 0.5rem 0.75rem;
+        border-radius: 20px;
+
+        ion-icon {
+          font-size: 1.25rem;
+        }
+      }
+    }
+
+    .article-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+      .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        color: var(--ion-color-medium);
+        font-size: 0.9rem;
+
+        ion-icon {
+          font-size: 1.125rem;
+          color: var(--ion-color-primary);
+        }
+      }
+    }
+
+    .price-per-unit {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .label {
+        font-size: 0.9rem;
+        color: var(--ion-color-medium);
+        font-weight: 600;
+      }
+
+      .value {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--ion-color-dark);
+      }
+    }
+  }
+
+  .quantity-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ion-color-dark);
+      margin: 0 0 1rem 0;
+    }
+
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+
+      ion-button {
+        --border-width: 2px;
+        --border-color: var(--ion-color-primary);
+        width: 56px;
+        height: 56px;
+        margin: 0;
+
+        ion-icon {
+          font-size: 1.5rem;
+        }
+      }
+
+      .quantity-display {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.75rem;
+        background: var(--ion-color-light);
+        border-radius: 12px;
+
+        .quantity-input {
+          width: 100%;
+          text-align: center;
+          font-size: 2rem;
+          font-weight: 700;
+          color: var(--ion-color-dark);
+          border: none;
+          background: transparent;
+          outline: none;
+
+          /* Remove spinner buttons */
+          &::-webkit-inner-spin-button,
+          &::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
+          -moz-appearance: textfield;
+        }
+
+        .unit {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: var(--ion-color-medium);
+          text-transform: uppercase;
+          margin-top: 0.25rem;
+        }
+      }
+    }
+  }
+
+  .total-section {
+    background: var(--ion-color-tertiary);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+
+    .total-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .total-label {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .total-price {
+        font-size: 2rem;
+        font-weight: 800;
+        color: white;
+      }
+    }
+  }
+
+  ion-toolbar.modal-footer {
+    --background: var(--ion-color-primary);
+    padding: 1rem;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+
+    ion-button {
+      margin: 0;
+      font-weight: 700;
+      height: 56px;
+      --box-shadow: 0 4px 12px rgba(var(--ion-color-secondary-rgb), 0.4);
+
+      ion-icon {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+

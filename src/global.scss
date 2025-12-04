@@ -35,3 +35,203 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/**
+ * Scrum Store Brand Colors
+ * -----------------------------------------------------
+ */
+
+:root {
+  /** primary - Azul **/
+  --ion-color-primary: #0C75AC;
+  --ion-color-primary-rgb: 12, 117, 172;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #0b6797;
+  --ion-color-primary-tint: #2483b4;
+
+  /** secondary - Amarillo/Dorado **/
+  --ion-color-secondary: #fccb34;
+  --ion-color-secondary-rgb: 252, 203, 52;
+  --ion-color-secondary-contrast: #000000;
+  --ion-color-secondary-contrast-rgb: 0, 0, 0;
+  --ion-color-secondary-shade: #deb32e;
+  --ion-color-secondary-tint: #fcd048;
+
+  /** tertiary - Magenta **/
+  --ion-color-tertiary: #AC0C74;
+  --ion-color-tertiary-rgb: 172, 12, 116;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #970b66;
+  --ion-color-tertiary-tint: #b42482;
+
+  /** success **/
+  --ion-color-success: #10B981;
+  --ion-color-success-rgb: 16, 185, 129;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #0ea372;
+  --ion-color-success-tint: #28c08e;
+
+  /** warning **/
+  --ion-color-warning: #F59E0B;
+  --ion-color-warning-rgb: 245, 158, 11;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #d88b0a;
+  --ion-color-warning-tint: #f6a823;
+
+  /** danger **/
+  --ion-color-danger: #EF4444;
+  --ion-color-danger-rgb: 239, 68, 68;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #d23c3c;
+  --ion-color-danger-tint: #f15757;
+
+  /** dark **/
+  --ion-color-dark: #2C3E50;
+  --ion-color-dark-rgb: 44, 62, 80;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #273746;
+  --ion-color-dark-tint: #415162;
+
+  /** medium **/
+  --ion-color-medium: #6B7280;
+  --ion-color-medium-rgb: 107, 114, 128;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #5e6471;
+  --ion-color-medium-tint: #7a808d;
+
+  /** light **/
+  --ion-color-light: #F7FAFC;
+  --ion-color-light-rgb: 247, 250, 252;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade: #d9dcde;
+  --ion-color-light-tint: #f8fbfc;
+}
+
+/**
+ * Global Styles
+ * -----------------------------------------------------
+ */
+
+/* Smooth scrolling */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Global card styles */
+ion-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+}
+
+/* Global button styles */
+ion-button {
+  --border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+ion-button[color="secondary"][disabled] {
+  --background: #b8913b;
+  --color: rgba(0, 0, 0, 0.5);
+}
+
+ion-button[color="primary"][disabled] {
+  --background: #0a5d8a;
+  --color: rgba(255, 255, 255, 0.5);
+}
+
+ion-button[fill="outline"][disabled] {
+  --border-color: rgba(255, 255, 255, 0.3);
+  --color: rgba(255, 255, 255, 0.4);
+}
+
+/* Button Classes - Reusable styles */
+.btn-primary-action {
+  --border-radius: 12px;
+  --padding-top: 1rem;
+  --padding-bottom: 1rem;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  height: 56px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:active {
+    --box-shadow: none;
+    transform: scale(0.95);
+  }
+}
+
+.btn-secondary-action {
+  --background: var(--ion-color-secondary);
+  --background-activated: var(--ion-color-secondary-shade);
+  --background-hover: var(--ion-color-secondary-tint);
+  --color: #000000;
+  --border-radius: 12px;
+  --padding-top: 1rem;
+  --padding-bottom: 1rem;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  height: 56px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:active {
+    --box-shadow: none;
+    transform: scale(0.95);
+  }
+}
+
+.btn-small {
+  --border-radius: 8px;
+  --padding-top: 0.75rem;
+  --padding-bottom: 0.75rem;
+  --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  height: 48px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:active {
+    --box-shadow: none;
+    transform: scale(0.95);
+  }
+}
+
+/* Global transitions */
+ion-card,
+ion-button,
+ion-item {
+  transition: all 0.3s ease;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+p {
+  line-height: 1.5;
+}
+
+input,
+textarea {
+  caret-color: rgba(255, 255, 255, 0.6) !important;
+}

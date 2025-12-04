@@ -1,0 +1,300 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-title>{{ 'PROFILE.TITLE' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="profile-content-page">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{ 'PROFILE.TITLE' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading()" class="loading-container">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <div *ngIf="!isLoading()" class="profile-container">
+    <!-- User Info Card -->
+    <ion-card class="user-card">
+      <ion-card-header>
+        <div class="user-header">
+          <ion-avatar class="user-avatar">
+            <img 
+              *ngIf="currentUser()?.profile_image" 
+              [src]="currentUser()?.profile_image" 
+              [alt]="currentUser()?.name"
+            />
+            <ion-icon 
+              *ngIf="!currentUser()?.profile_image"
+              name="person-outline"
+              class="avatar-icon"
+            ></ion-icon>
+          </ion-avatar>
+          <div class="user-info">
+            <h2>{{ currentUser()?.name }} {{ currentUser()?.surname }}</h2>
+            <p class="user-email">{{ currentUser()?.email }}</p>
+          </div>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-list lines="none" class="user-details">
+          <ion-item>
+            <ion-icon slot="start" name="mail-outline"></ion-icon>
+            <ion-label>
+              <p>{{ 'PROFILE.EMAIL' | translate }}</p>
+              <h3>{{ currentUser()?.email }}</h3>
+            </ion-label>
+          </ion-item>
+
+          <ion-item *ngIf="currentUser()?.phone">
+            <ion-icon slot="start" name="call-outline"></ion-icon>
+            <ion-label>
+              <p>{{ 'PROFILE.PHONE' | translate }}</p>
+              <h3>{{ currentUser()?.phone }}</h3>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Accordions -->
+    <ion-accordion-group [multiple]="true" [value]="['consumer-group', 'orders']">
+      
+      <!-- Consumer Group Accordion -->
+      <ion-accordion value="consumer-group" class="profile-accordion">
+        <ion-item slot="header" class="accordion-header">
+          <ion-icon name="storefront-outline" slot="start"></ion-icon>
+          <ion-label>{{ 'PROFILE.CONSUMER_GROUP' | translate }}</ion-label>
+        </ion-item>
+
+        <div slot="content" class="accordion-content">
+          <!-- Group Selector -->
+          <div class="group-selector" *ngIf="userGroups().length > 0">
+            <ion-item>
+              <ion-icon slot="start" name="swap-horizontal-outline"></ion-icon>
+              <ion-select 
+                [label]="'PROFILE.SELECT_GROUP' | translate"
+                [value]="currentGroup()?.id"
+                (ionChange)="onGroupChange($event)"
+                interface="action-sheet"
+              >
+                <ion-select-option *ngFor="let group of userGroups()" [value]="group.id">
+                  {{ group.name }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </div>
+
+          <!-- Current Group Info -->
+          <div *ngIf="currentGroup()" class="group-info">
+            <ion-list lines="none">
+              <ion-item>
+                <ion-icon slot="start" name="storefront-outline"></ion-icon>
+                <ion-label>
+                  <p>{{ 'PROFILE.GROUP_NAME' | translate }}</p>
+                  <h3>{{ currentGroup()?.name }}</h3>
+                </ion-label>
+                <ion-badge 
+                  [color]="isGroupOpen() ? 'success' : 'danger'" 
+                  slot="end"
+                >
+                  {{ (isGroupOpen() ? 'PROFILE.OPEN' : 'PROFILE.CLOSED') | translate }}
+                </ion-badge>
+              </ion-item>
+
+              <ion-item *ngIf="currentGroup()?.city">
+                <ion-icon slot="start" name="location-outline"></ion-icon>
+                <ion-label>
+                  <p>{{ 'PROFILE.LOCATION' | translate }}</p>
+                  <h3>{{ currentGroup()?.city }}</h3>
+                  <p *ngIf="currentGroup()?.address">{{ currentGroup()?.address }}</p>
+                </ion-label>
+              </ion-item>
+
+              <ion-item>
+                <ion-icon slot="start" name="time-outline"></ion-icon>
+                <ion-label>
+                  <p>{{ 'PROFILE.HOURS_TODAY' | translate }}</p>
+                  <h3>{{ getGroupOpeningHoursToday() }}</h3>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </div>
+
+          <div *ngIf="!currentGroup() && userGroups().length === 0" class="no-groups">
+            <p>{{ 'PROFILE.NO_GROUPS' | translate }}</p>
+          </div>
+        </div>
+      </ion-accordion>
+
+      <!-- Orders Accordion -->
+      <ion-accordion value="orders" class="profile-accordion">
+        <ion-item slot="header" class="accordion-header">
+          <ion-icon name="receipt-outline" slot="start"></ion-icon>
+          <ion-label>{{ 'PROFILE.MY_ORDERS' | translate }}</ion-label>
+          <ion-badge *ngIf="userOrders().length > 0" color="primary" slot="end">
+            {{ userOrders().length }}
+          </ion-badge>
+        </ion-item>
+
+        <div slot="content" class="accordion-content">
+          <div *ngIf="userOrders().length === 0" class="no-orders">
+            <ion-icon name="cart-outline" class="no-orders-icon"></ion-icon>
+            <p>{{ 'PROFILE.NO_ORDERS' | translate }}</p>
+          </div>
+
+          <div *ngIf="userOrders().length > 0" class="orders-list">
+            <div *ngFor="let order of userOrders()" class="order-item" (click)="openOrderDetail(order)">
+              <div class="order-header">
+                <div class="order-info">
+                  <span class="order-id">{{ 'PROFILE.ORDER' | translate }} #{{ order.id.slice(-8) }}</span>
+                  <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+                </div>
+                <ion-badge [color]="getOrderStatusColor(order.status)" class="order-status">
+                  {{ ('PROFILE.ORDER_STATUS_' + order.status.toUpperCase()) | translate }}
+                </ion-badge>
+              </div>
+              <div class="order-summary">
+                <span class="order-items">{{ order.items.length }} {{ 'PROFILE.ITEMS' | translate }}</span>
+                <span class="order-total">{{ formatPrice(order.totalPrice) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-accordion>
+
+    </ion-accordion-group>
+
+    <!-- Logout Button -->
+    <div class="logout-section">
+      <ion-button 
+        expand="block" 
+        color="danger" 
+        (click)="confirmLogout()"
+        [disabled]="isLoading()"
+      >
+        <ion-icon slot="start" name="log-out-outline"></ion-icon>
+        {{ 'PROFILE.LOGOUT' | translate }}
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <ion-modal
+    [isOpen]="isOrderDetailOpen()"
+    (didDismiss)="closeOrderDetail()"
+    class="order-detail-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>{{ 'PROFILE.ORDER_DETAIL' | translate }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeOrderDetail()">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="order-detail-content">
+        <div *ngIf="selectedOrder()" class="detail-container">
+          <!-- Order Info -->
+          <div class="order-info-card">
+            <div class="info-header">
+              <div>
+                <h2>{{ 'PROFILE.ORDER' | translate }} #{{ selectedOrder()!.id.slice(-8) }}</h2>
+                <p class="order-date-detail">{{ formatDate(selectedOrder()!.createdAt) }}</p>
+              </div>
+              <ion-badge [color]="getOrderStatusColor(selectedOrder()!.status)" class="status-badge-large">
+                {{ ('PROFILE.ORDER_STATUS_' + selectedOrder()!.status.toUpperCase()) | translate }}
+              </ion-badge>
+            </div>
+          </div>
+
+          <!-- Order Items -->
+          <div class="items-section">
+            <h3 class="section-title">{{ 'PROFILE.ORDER_ITEMS' | translate }} ({{ selectedOrder()!.items.length }})</h3>
+            
+            <ion-card *ngFor="let item of selectedOrder()!.items" class="item-card">
+              <div class="item-detail">
+                <!-- Item Header -->
+                <div class="item-main">
+                  <div class="item-image" *ngIf="item.article?.image">
+                    <img [src]="item.article.image" [alt]="item.article.product || item.article.name">
+                  </div>
+                  <div class="item-image placeholder" *ngIf="!item.article?.image">
+                    <ion-icon name="cart-outline"></ion-icon>
+                  </div>
+
+                  <div class="item-info">
+                    <div class="item-title">
+                      <span class="item-category">{{ item.article?.category || '' }}</span>
+                      <h4>{{ item.article?.product || item.article?.name || 'Article' }}</h4>
+                      <p *ngIf="item.article?.variety" class="item-variety">{{ item.article.variety }}</p>
+                    </div>
+                    <ion-badge *ngIf="item.article?.isSeasonal" color="success" class="seasonal-badge-small">
+                      <ion-icon name="leaf-outline"></ion-icon>
+                    </ion-badge>
+                  </div>
+                </div>
+
+                <!-- Producer info if available -->
+                <div class="producer-info" *ngIf="item.article?.producerName">
+                  <ion-icon name="person-outline"></ion-icon>
+                  <span>{{ item.article.producerName }}</span>
+                  <span *ngIf="item.article?.city" class="city">· {{ item.article.city }}</span>
+                </div>
+                
+                <!-- Item Details -->
+                <div class="item-pricing">
+                  <div class="pricing-row price-unit">
+                    <div class="label-group">
+                      <ion-icon name="pricetag-outline"></ion-icon>
+                      <span class="label">{{ 'PROFILE.PRICE_PER_UNIT' | translate }}</span>
+                    </div>
+                    <span class="value">{{ formatPrice(item.pricePerUnit) }}/{{ item.article?.unitMeasure || 'ud' }}</span>
+                  </div>
+
+                  <div class="pricing-row quantity">
+                    <div class="label-group">
+                      <ion-icon name="cube-outline"></ion-icon>
+                      <span class="label">{{ 'PROFILE.QUANTITY' | translate }}</span>
+                    </div>
+                    <span class="value-quantity">
+                      <span class="number">{{ item.quantity }}</span>
+                      <span class="unit">{{ item.article?.unitMeasure || 'ud' }}</span>
+                    </span>
+                  </div>
+
+                  <div class="pricing-row subtotal">
+                    <div class="label-group">
+                      <ion-icon name="calculator-outline"></ion-icon>
+                      <span class="label">{{ 'PROFILE.SUBTOTAL' | translate }}</span>
+                    </div>
+                    <span class="value-total">{{ formatPrice(item.totalPrice) }}</span>
+                  </div>
+                </div>
+              </div>
+            </ion-card>
+          </div>
+        </div>
+      </ion-content>
+
+      <ion-toolbar class="modal-footer">
+        <div class="footer-content">
+          <div class="total-section">
+            <div class="total-info">
+              <span class="total-label">{{ 'PROFILE.TOTAL' | translate }}</span>
+              <span class="items-count">{{ selectedOrder()!.items.length }} {{ 'PROFILE.ITEMS' | translate }}</span>
+            </div>
+            <span class="total-price">{{ formatPrice(selectedOrder()?.totalPrice || 0) }}</span>
+          </div>
+        </div>
+      </ion-toolbar>
+    </ng-template>
+  </ion-modal>
+</ion-content>

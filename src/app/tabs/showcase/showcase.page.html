@@ -1,0 +1,313 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar class="header-toolbar">
+    <ion-title class="header-title">
+      <ion-icon name="storefront-outline"></ion-icon>
+      {{ 'SHOWCASE.TITLE' | translate }}
+    </ion-title>
+  </ion-toolbar>
+  <ion-toolbar class="search-toolbar">
+    <ion-searchbar
+      [placeholder]="'SHOWCASE.SEARCH_PLACEHOLDER' | translate"
+      (ionInput)="onSearchChange($event)"
+      [debounce]="300"
+      class="search-bar"
+      animated="true"
+      mode="ios">
+    </ion-searchbar>
+  </ion-toolbar>
+
+  <!-- Filters toolbar -->
+  <ion-toolbar class="filters-toolbar">
+    <div class="filters-container">
+      <!-- Seasonal filter -->
+      <ion-chip
+        [outline]="!showSeasonalOnly()"
+        [color]="showSeasonalOnly() ? 'success' : 'medium'"
+        (click)="toggleSeasonalFilter()">
+        <ion-icon name="leaf-outline"></ion-icon>
+        <ion-label>{{ 'SHOWCASE.SEASONAL' | translate }}</ion-label>
+      </ion-chip>
+
+      <!-- Filters button with badge and clear button -->
+      <div class="filters-chip-container">
+        <ion-chip
+          (click)="openFiltersModal()"
+          [color]="activeFiltersCount() > 0 ? 'primary' : 'medium'">
+          <div class="filters-chip-content">
+            <ion-icon name="funnel-outline"></ion-icon>
+            <ion-label>{{ 'SHOWCASE.FILTERS' | translate }}</ion-label>
+          </div>
+          <span *ngIf="activeFiltersCount() > 0" color="secondary">{{ activeFiltersCount() }}</span>
+        </ion-chip>
+        <ion-button
+          *ngIf="hasActiveFilters()"
+          fill="clear"
+          size="small"
+          color="danger"
+          class="clear-filters-button"
+          (click)="clearFilters()">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="aparador-content">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="arrow-down"
+      refreshingSpinner="crescent">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Modal de filtres -->
+  <ion-modal [isOpen]="isFiltersModalOpen()" (didDismiss)="closeFiltersModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>{{ 'SHOWCASE.FILTERS' | translate }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeFiltersModal()">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="filters-modal-content">
+        <!-- Hierarchical filters with accordions -->
+        <ion-accordion-group [multiple]="true" [value]="getCategoryAccordionValues()">
+          <ion-accordion *ngFor="let categoryGroup of filterHierarchy(); let i = index" [value]="'category-' + i">
+
+            <!-- Category header (accordion trigger) -->
+            <ion-item slot="header" class="category-header">
+              <ion-checkbox
+                slot="start"
+                [checked]="isSelectedCategory(categoryGroup.category)"
+                (click)="$event.stopPropagation()"
+                (ionChange)="toggleCategory(categoryGroup.category)">
+              </ion-checkbox>
+              <ion-label>{{ categoryGroup.category }}</ion-label>
+            </ion-item>
+
+            <!-- Products under this category (accordion content) -->
+            <div slot="content" class="accordion-content">
+              <ion-accordion-group [multiple]="true" [value]="getProductAccordionValues(i)">
+                <ion-accordion *ngFor="let productGroup of categoryGroup.products; let j = index" [value]="'product-' + i + '-' + j">
+
+                  <!-- Product header (nested accordion trigger) -->
+                  <ion-item slot="header" class="product-header">
+                    <ion-checkbox
+                      slot="start"
+                      [checked]="isSelectedProduct(productGroup.product)"
+                      (click)="$event.stopPropagation()"
+                      (ionChange)="toggleProduct(productGroup.product)">
+                    </ion-checkbox>
+                    <ion-label>{{ productGroup.product }}</ion-label>
+                  </ion-item>
+
+                  <!-- Varieties under this product (nested accordion content) -->
+                  <div slot="content" class="varieties-content" *ngIf="productGroup.varieties.length > 0">
+                    <ion-item
+                      class="variety-item"
+                      *ngFor="let variety of productGroup.varieties"
+                      (click)="toggleVariety(variety)">
+                      <ion-checkbox
+                        slot="start"
+                        [checked]="isSelectedVariety(variety)">
+                      </ion-checkbox>
+                      <ion-label>{{ variety }}</ion-label>
+                    </ion-item>
+                  </div>
+
+                </ion-accordion>
+              </ion-accordion-group>
+            </div>
+
+          </ion-accordion>
+        </ion-accordion-group>
+      </ion-content>
+
+      <ion-toolbar class="modal-footer">
+        <ion-button expand="block" color="primary" (click)="applyFilters()">
+          <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+          {{ 'SHOWCASE.APPLY_FILTERS' | translate }}
+        </ion-button>
+      </ion-toolbar>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-container">
+    <ion-spinner name="crescent" color="secondary"></ion-spinner>
+    <p class="loading-text">{{ 'COMMON.LOADING' | translate }}</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading() && articles().length === 0" class="empty-state">
+    <div class="empty-icon-wrapper">
+      <ion-icon name="storefront-outline" class="empty-icon"></ion-icon>
+    </div>
+    <h2 class="empty-title">{{ 'SHOWCASE.NO_ARTICLES' | translate }}</h2>
+    <p class="empty-description">
+      {{ searchText() ? ('SHOWCASE.NO_RESULTS' | translate) : ('SHOWCASE.NO_ARTICLES_DESC' | translate) }}
+    </p>
+  </div>
+
+  <!-- Articles List -->
+  <div *ngIf="!isLoading() && articles().length > 0" class="articles-container">
+    <ion-card *ngFor="let article of articles()" class="article-card">
+      <ion-card-content>
+        <!-- Header with category and seasonal badge -->
+        <div class="card-header">
+          <span class="article-category">{{ article.category || 'General' }}</span>
+          <ion-badge *ngIf="article.isSeasonal" class="seasonal-badge" color="success">
+            <ion-icon name="leaf-outline"></ion-icon>
+          </ion-badge>
+        </div>
+
+        <!-- Title -->
+        <h2 class="article-title">{{ article.product || article.name }}</h2>
+        <p *ngIf="article.variety" class="article-variety">{{ article.variety }}</p>
+
+        <!-- Info compact -->
+        <div class="article-info-compact">
+          <div class="info-row" *ngIf="article.producerName">
+            <ion-icon name="person-outline"></ion-icon>
+            <span>{{ article.producerName }}</span>
+          </div>
+          <div class="info-row" *ngIf="article.city">
+            <ion-icon name="location-outline"></ion-icon>
+            <span>{{ article.city }}</span>
+          </div>
+        </div>
+
+        <!-- Footer with price and button -->
+        <div class="article-footer">
+          <div class="price-section">
+            <span class="price">{{ formatPrice(article.pricePerUnit, article.unitMeasure) }}</span>
+          </div>
+          <ion-button
+            (click)="addToCart(article, $event)"
+            color="secondary"
+            size="small"
+            class="add-button">
+            <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Modal Add to Cart -->
+  <ion-modal
+    [isOpen]="isAddToCartModalOpen()"
+    (didDismiss)="closeAddToCartModal()"
+    class="add-to-cart-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>{{ 'ADD_TO_CART_MODAL.TITLE' | translate }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeAddToCartModal()">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="add-to-cart-content">
+        <div *ngIf="selectedArticle()" class="modal-body">
+          <!-- Article image -->
+          <div class="article-image-container" *ngIf="selectedArticle()?.image">
+            <img [src]="selectedArticle()!.image" [alt]="selectedArticle()!.product || selectedArticle()!.name" class="article-image">
+          </div>
+
+          <!-- Article info -->
+          <div class="article-info">
+            <div class="article-header">
+              <div class="article-title-section">
+                <span class="article-category">{{ selectedArticle()?.category }}</span>
+                <h2 class="article-name">{{ selectedArticle()?.product || selectedArticle()?.name }}</h2>
+                <p *ngIf="selectedArticle()?.variety" class="article-variety">{{ selectedArticle()!.variety }}</p>
+              </div>
+              <ion-badge *ngIf="selectedArticle()?.isSeasonal" color="success" class="seasonal-badge">
+                <ion-icon name="leaf-outline"></ion-icon>
+              </ion-badge>
+            </div>
+
+            <div class="article-details">
+              <div class="detail-row" *ngIf="selectedArticle()?.producerName">
+                <ion-icon name="person-outline"></ion-icon>
+                <span>{{ selectedArticle()!.producerName }}</span>
+              </div>
+              <div class="detail-row" *ngIf="selectedArticle()?.city">
+                <ion-icon name="location-outline"></ion-icon>
+                <span>{{ selectedArticle()!.city }}</span>
+              </div>
+            </div>
+
+            <div class="price-per-unit">
+              <span class="label">{{ 'ADD_TO_CART_MODAL.PRICE_PER_UNIT' | translate }}:</span>
+              <span class="value">{{ formatPrice(selectedArticle()!.pricePerUnit, selectedArticle()!.unitMeasure) }}</span>
+            </div>
+          </div>
+
+          <!-- Quantity selector -->
+          <div class="quantity-section">
+            <h3 class="section-title">{{ 'ADD_TO_CART_MODAL.QUANTITY' | translate }}</h3>
+
+            <div class="quantity-control">
+              <ion-button
+                fill="outline"
+                size="large"
+                (click)="decreaseQuantity()"
+                [disabled]="modalQuantity() <= getQuantityStep()">
+                <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+              </ion-button>
+
+              <div class="quantity-display">
+                <input
+                  type="number"
+                  class="quantity-input"
+                  [value]="modalQuantity()"
+                  (input)="onModalQuantityChange($event)"
+                  [step]="getQuantityStep()"
+                  min="0">
+                <span class="unit">{{ selectedArticle()?.unitMeasure }}</span>
+              </div>
+
+              <ion-button
+                fill="outline"
+                size="large"
+                (click)="increaseQuantity()">
+                <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+          <!-- Total price -->
+          <div class="total-section">
+            <div class="total-row">
+              <span class="total-label">{{ 'ADD_TO_CART_MODAL.TOTAL' | translate }}:</span>
+              <span class="total-price">{{ formatTotalPrice() }}</span>
+            </div>
+          </div>
+        </div>
+      </ion-content>
+
+      <ion-toolbar class="modal-footer">
+        <ion-button
+          expand="block"
+          color="secondary"
+          size="large"
+          (click)="confirmAddToCart()">
+          <ion-icon slot="start" name="cart-outline"></ion-icon>
+          {{ 'ADD_TO_CART_MODAL.ADD_BUTTON' | translate }}
+        </ion-button>
+      </ion-toolbar>
+    </ng-template>
+  </ion-modal>
+</ion-content>
+

@@ -1,0 +1,57 @@
+<ion-content class="login-content">
+  <div class="login-container">
+    <!-- Logo Section -->
+    <div class="logo-section">
+      <img src="assets/icon/scrum-logo.png" alt="Scrum Store" class="logo" />
+      <h1 class="title">{{ 'LOGIN.TITLE' | translate }}</h1>
+    </div>
+
+    <!-- Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <ion-input
+          type="email"
+          formControlName="email"
+          [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate"
+          class="form-input">
+        </ion-input>
+      </div>
+
+      <div class="form-group">
+        <ion-input
+          type="password"
+          formControlName="password"
+          [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate"
+          class="form-input">
+          <ion-input-password-toggle slot="end" class="password-toggle"></ion-input-password-toggle>
+        </ion-input>
+      </div>
+
+      <div class="forgot-password">
+        <a href="#" class="forgot-link">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
+      </div>
+
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="isLoading"
+        color="secondary"
+        class="btn-primary-action">
+        <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+        <span *ngIf="!isLoading">{{ 'LOGIN.LOGIN_BUTTON' | translate }}</span>
+      </ion-button>
+
+      <div class="signup-section">
+        <p class="signup-text">{{ 'LOGIN.SIGNUP_TEXT' | translate }}</p>
+        <ion-button
+          expand="block"
+          fill="outline"
+          color="light"
+          class="signup-button">
+          {{ 'LOGIN.SIGNUP_BUTTON' | translate }}
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>
+

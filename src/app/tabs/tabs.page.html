@@ -1,0 +1,25 @@
+<ion-tabs>
+  <ion-tab-bar slot="bottom" class="tabs-bar">
+    <ion-tab-button tab="showcase" class="tab-button">
+      <ion-icon name="storefront-outline"></ion-icon>
+      <ion-label>{{ 'TABS.APARADOR' | translate }}</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="cart" class="tab-button">
+      <ion-icon name="cart-outline"></ion-icon>
+      <ion-label>{{ 'TABS.CISTELLA' | translate }}</ion-label>
+      <ion-badge *ngIf="cartItemsCount() > 0" color="secondary">{{ cartItemsCount() }}</ion-badge>
+    </ion-tab-button>
+
+    <ion-tab-button tab="group" class="tab-button">
+      <ion-icon name="people-outline"></ion-icon>
+      <ion-label>{{ 'TABS.GRUP' | translate }}</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="profile" class="tab-button">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>{{ 'TABS.PERFIL' | translate }}</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
+

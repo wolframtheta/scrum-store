@@ -1,0 +1,118 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-title>{{ 'TABS.CISTELLA' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="cart-content-page">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{ 'TABS.CISTELLA' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Empty state -->
+  <div *ngIf="items().length === 0" class="empty-state">
+    <ion-icon name="cart-outline" class="empty-icon"></ion-icon>
+    <h2>{{ 'CART.EMPTY_TITLE' | translate }}</h2>
+    <p>{{ 'CART.EMPTY_MESSAGE' | translate }}</p>
+  </div>
+
+  <!-- Cart items list -->
+  <div *ngIf="items().length > 0" class="cart-content">
+    <div class="cart-list">
+      <ion-item-sliding *ngFor="let item of items()">
+        <ion-card class="cart-item">
+          <!-- Article info -->
+          <div class="item-content">
+            <!-- Image placeholder or actual image -->
+            <div class="item-image" *ngIf="item.article.image">
+              <img [src]="item.article.image" [alt]="item.article.product || item.article.name">
+            </div>
+            <div class="item-image placeholder" *ngIf="!item.article.image">
+              <ion-icon name="cart-outline"></ion-icon>
+            </div>
+
+            <!-- Article details -->
+            <div class="item-details">
+              <div class="item-header">
+                <div class="item-title-section">
+                  <span class="item-category">{{ item.article.category }}</span>
+                  <h3 class="item-name">{{ item.article.product || item.article.name }}</h3>
+                  <p *ngIf="item.article.variety" class="item-variety">{{ item.article.variety }}</p>
+                </div>
+                <ion-badge *ngIf="item.article.isSeasonal" color="success" class="seasonal-badge">
+                  <ion-icon name="leaf-outline"></ion-icon>
+                </ion-badge>
+              </div>
+
+              <!-- Price per unit -->
+              <div class="item-price-per-unit">
+                <span>{{ formatPrice(item.article.pricePerUnit) }}/{{ item.article.unitMeasure }}</span>
+              </div>
+
+              <!-- Quantity controls -->
+              <div class="quantity-controls">
+                <ion-button 
+                  fill="outline" 
+                  size="small" 
+                  (click)="decreaseQuantity(item)"
+                  class="quantity-btn">
+                  <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+                </ion-button>
+
+                <div class="quantity-display">
+                  <span class="quantity-value">{{ item.quantity }}</span>
+                  <span class="quantity-unit">{{ item.article.unitMeasure }}</span>
+                </div>
+
+                <ion-button 
+                  fill="outline" 
+                  size="small" 
+                  (click)="increaseQuantity(item)"
+                  class="quantity-btn">
+                  <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+                </ion-button>
+              </div>
+
+              <!-- Total price for this item -->
+              <div class="item-total-price">
+                <span class="total-label">{{ 'CART.SUBTOTAL' | translate }}:</span>
+                <span class="total-value">{{ formatPrice(item.totalPrice) }}</span>
+              </div>
+            </div>
+          </div>
+        </ion-card>
+
+        <!-- Swipe to delete -->
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="removeItem(item)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </div>
+  </div>
+</ion-content>
+
+<!-- Footer with total and confirm button -->
+<ion-footer *ngIf="items().length > 0" class="cart-footer">
+  <ion-toolbar>
+    <div class="footer-content">
+      <div class="total-section">
+        <span class="total-label">{{ 'CART.TOTAL' | translate }}:</span>
+        <span class="total-price">{{ formatPrice(totalPrice()) }}</span>
+      </div>
+      <ion-button 
+        expand="block" 
+        color="secondary" 
+        size="large"
+        (click)="confirmOrder()">
+        <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+        {{ 'CART.CONFIRM_ORDER' | translate }}
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>
+
+

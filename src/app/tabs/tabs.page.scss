@@ -1,0 +1,32 @@
+.tabs-bar {
+  --background: var(--ion-color-primary);
+  --border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button {
+  --color: rgba(255, 255, 255, 0.6);
+  --color-selected: var(--ion-color-secondary);
+
+  ion-icon {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+
+  ion-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+  }
+
+  &.tab-selected {
+    ion-icon,
+    ion-label {
+      color: var(--ion-color-secondary);
+    }
+  }
+}
+
