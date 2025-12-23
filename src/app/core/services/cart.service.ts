@@ -6,6 +6,7 @@ export interface CartItem {
   article: Article;
   quantity: number; // Quantitat en la unitat de mesura de l'article
   totalPrice: number;
+  orderPeriodId?: string; // Nou: ID del període de pedido
 }
 
 @Injectable({
@@ -13,15 +14,15 @@ export interface CartItem {
 })
 export class CartService {
   private readonly CART_STORAGE_KEY = 'cart_items';
-  
+
   private _items = signal<CartItem[]>([]);
-  
+
   // Public readonly signals
   public readonly items = this._items.asReadonly();
-  
+
   // Computed: total d'articles diferents
   public readonly itemsCount = computed(() => this._items().length);
-  
+
   // Computed: preu total de la cistella
   public readonly totalPrice = computed(() => {
     return this._items().reduce((sum, item) => sum + item.totalPrice, 0);
@@ -54,29 +55,34 @@ export class CartService {
   async addItem(article: Article, quantity: number): Promise<void> {
     const items = [...this._items()];
     const existingIndex = items.findIndex(item => item.article.id === article.id);
-    
-    const pricePerUnit = typeof article.pricePerUnit === 'string' 
-      ? parseFloat(article.pricePerUnit) 
+
+    const pricePerUnit = typeof article.pricePerUnit === 'string'
+      ? parseFloat(article.pricePerUnit)
       : article.pricePerUnit;
-    
+
     const totalPrice = pricePerUnit * quantity;
-    
+
+    // Extraer orderPeriodId si existe en el artículo
+    const orderPeriodId = (article as any).orderPeriodId;
+
     if (existingIndex >= 0) {
       // Actualitzar quantitat si ja existeix
       items[existingIndex] = {
         article,
         quantity,
-        totalPrice
+        totalPrice,
+        orderPeriodId
       };
     } else {
       // Afegir nou article
       items.push({
         article,
         quantity,
-        totalPrice
+        totalPrice,
+        orderPeriodId
       });
     }
-    
+
     this._items.set(items);
     await this.saveCart();
   }
@@ -111,17 +117,18 @@ export class CartService {
   async updateQuantity(articleId: string, quantity: number): Promise<void> {
     const items = [...this._items()];
     const index = items.findIndex(item => item.article.id === articleId);
-    
+
     if (index >= 0 && quantity > 0) {
       const article = items[index].article;
-      const pricePerUnit = typeof article.pricePerUnit === 'string' 
-        ? parseFloat(article.pricePerUnit) 
+      const pricePerUnit = typeof article.pricePerUnit === 'string'
+        ? parseFloat(article.pricePerUnit)
         : article.pricePerUnit;
-      
+
       items[index] = {
         article,
         quantity,
-        totalPrice: pricePerUnit * quantity
+        totalPrice: pricePerUnit * quantity,
+        orderPeriodId: items[index].orderPeriodId // Mantener el periodId
       };
       this._items.set(items);
       await this.saveCart();

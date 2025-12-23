@@ -70,11 +70,13 @@ export class ConsumerGroupService {
       tap(async (groups) => {
         this.userGroups.set(groups);
         console.log('Grupos del usuario:', groups);
+        console.log('Roles de cada grupo:', groups.map(g => ({ name: g.name, role: g.role })));
 
         // Solo seleccionar un grupo automáticamente si no hay uno seleccionado
         if (groups.length > 0 && !this.currentGroup()) {
           // 1. Buscar el grupo marcado como por defecto (isDefault = true)
           const defaultGroup = groups.find(g => g.role?.isDefault === true);
+          console.log('Grupo por defecto encontrado:', defaultGroup?.name, defaultGroup?.role);
 
           if (defaultGroup) {
             // Si hay un grupo por defecto, seleccionarlo
@@ -84,9 +86,9 @@ export class ConsumerGroupService {
             // Si solo hay un grupo, seleccionarlo automáticamente
             await this.setCurrentGroup(groups[0]);
             console.log('Único grupo seleccionado:', groups[0]);
+          } else {
+            console.warn('Múltiples grupos sin grupo por defecto. El usuario debe seleccionar manualmente.');
           }
-          // Si hay múltiples grupos y ninguno es por defecto, no seleccionar ninguno
-          // (el usuario deberá elegir manualmente)
         }
       })
     );

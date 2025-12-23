@@ -44,10 +44,7 @@
     "CATEGORIES": "Categorías",
     "PRODUCTS": "Productos",
     "VARIETIES": "Variedades",
-    "ADDED_TO_CART": "Artículo añadido a la cesta",
-    "ARTICLE_EXISTS_TITLE": "Artículo ya en la cesta",
-    "ARTICLE_EXISTS_MESSAGE": "Este artículo ya está en la cesta con {{quantity}} {{unit}}. ¿Quieres añadir más?",
-    "ADD_MORE": "Añadir más"
+    "ADDED_TO_CART": "Artículo añadido a la cesta"
   },
   "ADD_TO_CART_MODAL": {
     "TITLE": "Añadir a la cesta",
@@ -65,19 +62,6 @@
     "GRUP": "Grupo",
     "PERFIL": "Perfil"
   },
-  "CART": {
-    "EMPTY_TITLE": "La cesta está vacía",
-    "EMPTY_MESSAGE": "Añade artículos desde el escaparate para comenzar tu pedido",
-    "SUBTOTAL": "Subtotal",
-    "TOTAL": "Total",
-    "CONFIRM_ORDER": "Confirmar pedido",
-    "CONFIRM_ORDER_TITLE": "¿Confirmar pedido?",
-    "CONFIRM_ORDER_MESSAGE": "¿Estás seguro que quieres confirmar este pedido?",
-    "CONFIRM_BUTTON": "Confirmar",
-    "ITEM_REMOVED": "Artículo eliminado de la cesta",
-    "EMPTY_CART": "La cesta está vacía",
-    "ORDER_SUCCESS": "Pedido confirmado con éxito"
-  },
   "PROFILE": {
     "TITLE": "Perfil",
     "EMAIL": "Correo electrónico",
@@ -91,20 +75,6 @@
     "CLOSED": "Cerrado",
     "NO_GROUPS": "No perteneces a ningún grupo de consumo",
     "GROUP_CHANGED": "Grupo cambiado correctamente",
-    "MY_ORDERS": "Mis pedidos",
-    "NO_ORDERS": "Aún no has hecho ningún pedido",
-    "ORDER": "Pedido",
-    "ITEMS": "artículos",
-    "ORDER_STATUS_PENDING": "Pendiente",
-    "ORDER_STATUS_CONFIRMED": "Confirmado",
-    "ORDER_STATUS_DELIVERED": "Entregado",
-    "ORDER_STATUS_CANCELLED": "Cancelado",
-    "ORDER_DETAIL": "Detalle del pedido",
-    "ORDER_ITEMS": "Artículos del pedido",
-    "QUANTITY": "Cantidad",
-    "PRICE_PER_UNIT": "Precio por unidad",
-    "SUBTOTAL": "Subtotal",
-    "TOTAL": "Total",
     "LOGOUT": "Cerrar sesión",
     "LOGOUT_CONFIRM_TITLE": "¿Cerrar sesión?",
     "LOGOUT_CONFIRM_MESSAGE": "¿Estás seguro de que quieres cerrar sesión?",

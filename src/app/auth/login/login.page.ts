@@ -8,11 +8,15 @@ import {
   IonInput,
   IonInputPasswordToggle,
   IonSpinner,
-  IonIcon
+  IonIcon,
+  ModalController
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
+import { ConsumerGroupService } from '../../core/services/consumer-group.service';
 import { ToastController } from '@ionic/angular';
+import { GroupSelectorModalComponent } from '../components/group-selector-modal.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -38,9 +42,11 @@ export class LoginPage implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    private consumerGroupService: ConsumerGroupService,
     private router: Router,
     private route: ActivatedRoute,
     private toastController: ToastController,
+    private modalController: ModalController,
     private translate: TranslateService
   ) {
 
@@ -74,9 +80,30 @@ export class LoginPage implements OnInit {
       next: async () => {
         // Esperar un momento para que el signal se actualice
         await new Promise(resolve => setTimeout(resolve, 100));
-        // Usar navigateByUrl con replaceUrl para evitar que el guard se ejecute de nuevo
+
+        // Cargar grupos del usuario
+        try {
+          const groups = await firstValueFrom(this.consumerGroupService.loadUserGroups());
+          console.log('Grupos cargados después del login:', groups);
+
+          // Verificar si hay un grupo seleccionado
+          const currentGroup = this.consumerGroupService.currentGroup();
+
+          // Si no hay grupo seleccionado y hay múltiples grupos, mostrar modal
+          if (!currentGroup && groups.length > 1) {
+            console.log('Mostrando modal de selección de grupo');
+            await this.showGroupSelectorModal(groups);
+          } else if (!currentGroup && groups.length === 0) {
+            this.showToast(this.translate.instant('LOGIN.NO_GROUPS'), 'warning');
+          }
+        } catch (error) {
+          console.error('Error loading groups:', error);
+        }
+
+        // Navegar a la página principal
         this.router.navigateByUrl(this.returnUrl, { replaceUrl: true });
         this.showToast(this.translate.instant('COMMON.WELCOME'), 'success');
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Login error:', error);
@@ -84,6 +111,29 @@ export class LoginPage implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  async showGroupSelectorModal(groups: any[]) {
+    const modal = await this.modalController.create({
+      component: GroupSelectorModalComponent,
+      componentProps: {
+        groups: groups
+      },
+      backdropDismiss: false
+    });
+
+    await modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'selected' && data) {
+      console.log('Grupo seleccionado en modal:', data);
+      await this.consumerGroupService.setCurrentGroup(data);
+      this.showToast(
+        this.translate.instant('PROFILE.GROUP_CHANGED') + ': ' + data.name,
+        'success'
+      );
+    }
   }
 
   private async showToast(message: string, color: string) {

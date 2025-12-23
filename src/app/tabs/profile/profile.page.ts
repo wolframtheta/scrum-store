@@ -1,10 +1,11 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
   IonContent,
   IonCard,
   IonCardHeader,
@@ -23,15 +24,17 @@ import {
   IonAccordion,
   IonModal,
   IonButtons,
+  IonSegment,
+  IonSegmentButton,
   AlertController,
   ToastController
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { 
-  logOutOutline, 
-  personOutline, 
-  mailOutline, 
+import {
+  logOutOutline,
+  personOutline,
+  mailOutline,
   callOutline,
   storefrontOutline,
   locationOutline,
@@ -45,7 +48,7 @@ import { ConsumerGroupService } from '../../core/services/consumer-group.service
 import { OrdersService } from '../../core/services/orders.service';
 import { User } from '../../core/models/auth.model';
 import { ConsumerGroup } from '../../core/models/article.model';
-import { Order } from '../../core/models/order.model';
+import { Order, PaymentStatus } from '../../core/models/order.model';
 
 @Component({
   selector: 'app-profile',
@@ -54,6 +57,7 @@ import { Order } from '../../core/models/order.model';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     TranslateModule,
     IonHeader,
     IonToolbar,
@@ -75,7 +79,9 @@ import { Order } from '../../core/models/order.model';
     IonAccordionGroup,
     IonAccordion,
     IonModal,
-    IonButtons
+    IonButtons,
+    IonSegment,
+    IonSegmentButton
   ]
 })
 export class ProfilePage implements OnInit {
@@ -84,13 +90,44 @@ export class ProfilePage implements OnInit {
   userGroups = signal<ConsumerGroup[]>([]);
   isLoading = signal(false);
   isGroupOpen = signal(false);
-  
-  // Orders
-  userOrders = computed(() => this.ordersService.getUserOrders());
-  
+
+  // Orders & Filters
+  selectedPaymentTab = signal<string>('all');
+  userOrders = computed(() => {
+    const allOrders = this.ordersService.getUserOrders();
+    const tab = this.selectedPaymentTab();
+
+    if (tab === 'all') return allOrders;
+
+    return allOrders.filter(order => {
+      if (!order.paymentStatus) return tab === 'unpaid'; // Old orders without paymentStatus
+      return order.paymentStatus === tab;
+    });
+  });
+
+  unpaidCount = computed(() =>
+    this.ordersService.getUserOrders().filter(o =>
+      !o.paymentStatus || o.paymentStatus === PaymentStatus.UNPAID
+    ).length
+  );
+
+  partialCount = computed(() =>
+    this.ordersService.getUserOrders().filter(o =>
+      o.paymentStatus === PaymentStatus.PARTIAL
+    ).length
+  );
+
+  paidCount = computed(() =>
+    this.ordersService.getUserOrders().filter(o =>
+      o.paymentStatus === PaymentStatus.PAID
+    ).length
+  );
+
   // Order detail modal
   isOrderDetailOpen = signal(false);
   selectedOrder = signal<Order | null>(null);
+
+  readonly PaymentStatus = PaymentStatus;
 
   constructor(
     private authService: AuthService,
@@ -101,10 +138,10 @@ export class ProfilePage implements OnInit {
     private toastController: ToastController,
     private translate: TranslateService
   ) {
-    addIcons({ 
-      logOutOutline, 
-      personOutline, 
-      mailOutline, 
+    addIcons({
+      logOutOutline,
+      personOutline,
+      mailOutline,
       callOutline,
       storefrontOutline,
       locationOutline,
@@ -120,6 +157,14 @@ export class ProfilePage implements OnInit {
     this.loadConsumerGroups();
   }
 
+  async loadOrders() {
+    try {
+      await this.ordersService.loadOrders();
+    } catch (error) {
+      console.error('Error loading orders:', error);
+    }
+  }
+
   loadUserData() {
     // Subscribirse a los cambios del usuario actual
     this.currentUser.set(this.authService.currentUser());
@@ -133,6 +178,8 @@ export class ProfilePage implements OnInit {
         this.currentGroup.set(this.consumerGroupService.currentGroup());
         this.updateGroupStatus();
         this.isLoading.set(false);
+        // Load orders after groups are loaded
+        this.loadOrders();
       },
       error: (error) => {
         console.error('Error loading groups:', error);
@@ -155,6 +202,7 @@ export class ProfilePage implements OnInit {
       this.consumerGroupService.setCurrentGroup(group);
       this.currentGroup.set(group);
       this.updateGroupStatus();
+      this.loadOrders(); // Reload orders for new group
       this.showToast(this.translate.instant('PROFILE.GROUP_CHANGED'), 'success');
     }
   }
@@ -209,9 +257,9 @@ export class ProfilePage implements OnInit {
   }
 
   formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('ca-ES', { 
-      year: 'numeric', 
-      month: 'short', 
+    return new Date(date).toLocaleDateString('ca-ES', {
+      year: 'numeric',
+      month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -222,7 +270,8 @@ export class ProfilePage implements OnInit {
     return `${price.toFixed(2).replace('.', ',')} €`;
   }
 
-  getOrderStatusColor(status: string): string {
+  getOrderStatusColor(status?: string): string {
+    if (!status) return 'medium';
     switch (status) {
       case 'pending': return 'warning';
       case 'confirmed': return 'primary';
@@ -232,13 +281,43 @@ export class ProfilePage implements OnInit {
     }
   }
 
+  getPaymentStatusLabel(order: Order): string {
+    if (!order.paymentStatus) return 'PROFILE.ORDER_STATUS_PENDING';
+
+    switch (order.paymentStatus) {
+      case PaymentStatus.PAID:
+        return 'PROFILE.PAYMENT_STATUS_PAID';
+      case PaymentStatus.PARTIAL:
+        return 'PROFILE.PAYMENT_STATUS_PARTIAL';
+      case PaymentStatus.UNPAID:
+        return 'PROFILE.PAYMENT_STATUS_UNPAID';
+      default:
+        return 'PROFILE.ORDER_STATUS_PENDING';
+    }
+  }
+
+  getPaymentStatusColor(order: Order): string {
+    if (!order.paymentStatus) return 'warning';
+
+    switch (order.paymentStatus) {
+      case PaymentStatus.PAID:
+        return 'success';
+      case PaymentStatus.PARTIAL:
+        return 'warning';
+      case PaymentStatus.UNPAID:
+        return 'danger';
+      default:
+        return 'warning';
+    }
+  }
+
   async openOrderDetail(order: Order) {
     console.log('Opening order detail:', order); // Debug
-    
+
     // Open modal immediately with current data
     this.selectedOrder.set(order);
     this.isOrderDetailOpen.set(true);
-    
+
     // Then fetch fresh data from backend
     try {
       const freshOrder = await this.ordersService.getOrderById(order.id);

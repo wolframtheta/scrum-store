@@ -45,10 +45,7 @@
     "CATEGORIES": "Categories",
     "PRODUCTS": "Productes",
     "VARIETIES": "Varietats",
-    "ADDED_TO_CART": "Article afegit a la cistella",
-    "ARTICLE_EXISTS_TITLE": "Article ja a la cistella",
-    "ARTICLE_EXISTS_MESSAGE": "Aquest article ja està a la cistella amb {{quantity}} {{unit}}. Vols afegir més?",
-    "ADD_MORE": "Afegir més"
+    "ADDED_TO_CART": "Article afegit a la cistella"
   },
   "ADD_TO_CART_MODAL": {
     "TITLE": "Afegir a la cistella",
@@ -66,19 +63,6 @@
     "GRUP": "Grup",
     "PERFIL": "Perfil"
   },
-  "CART": {
-    "EMPTY_TITLE": "La cistella està buida",
-    "EMPTY_MESSAGE": "Afegeix articles des de l'aparador per començar la teva comanda",
-    "SUBTOTAL": "Subtotal",
-    "TOTAL": "Total",
-    "CONFIRM_ORDER": "Confirmar comanda",
-    "CONFIRM_ORDER_TITLE": "Confirmar comanda?",
-    "CONFIRM_ORDER_MESSAGE": "Estàs segur que vols confirmar aquesta comanda?",
-    "CONFIRM_BUTTON": "Confirmar",
-    "ITEM_REMOVED": "Article eliminat de la cistella",
-    "EMPTY_CART": "La cistella està buida",
-    "ORDER_SUCCESS": "Comanda confirmada amb èxit"
-  },
   "PROFILE": {
     "TITLE": "Perfil",
     "EMAIL": "Correu electrònic",
@@ -92,20 +76,6 @@
     "CLOSED": "Tancat",
     "NO_GROUPS": "No pertanys a cap grup de consum",
     "GROUP_CHANGED": "Grup canviat correctament",
-    "MY_ORDERS": "Les meves comandes",
-    "NO_ORDERS": "Encara no has fet cap comanda",
-    "ORDER": "Comanda",
-    "ITEMS": "articles",
-    "ORDER_STATUS_PENDING": "Pendent",
-    "ORDER_STATUS_CONFIRMED": "Confirmada",
-    "ORDER_STATUS_DELIVERED": "Lliurada",
-    "ORDER_STATUS_CANCELLED": "Cancel·lada",
-    "ORDER_DETAIL": "Detall de la comanda",
-    "ORDER_ITEMS": "Articles de la comanda",
-    "QUANTITY": "Quantitat",
-    "PRICE_PER_UNIT": "Preu per unitat",
-    "SUBTOTAL": "Subtotal",
-    "TOTAL": "Total",
     "LOGOUT": "Tancar sessió",
     "LOGOUT_CONFIRM_TITLE": "Tancar sessió?",
     "LOGOUT_CONFIRM_MESSAGE": "Estàs segur que vols tancar la sessió?",

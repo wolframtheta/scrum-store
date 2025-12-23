@@ -22,12 +22,12 @@
       <ion-card-header>
         <div class="user-header">
           <ion-avatar class="user-avatar">
-            <img 
-              *ngIf="currentUser()?.profile_image" 
-              [src]="currentUser()?.profile_image" 
+            <img
+              *ngIf="currentUser()?.profile_image"
+              [src]="currentUser()?.profile_image"
               [alt]="currentUser()?.name"
             />
-            <ion-icon 
+            <ion-icon
               *ngIf="!currentUser()?.profile_image"
               name="person-outline"
               class="avatar-icon"
@@ -63,7 +63,7 @@
 
     <!-- Accordions -->
     <ion-accordion-group [multiple]="true" [value]="['consumer-group', 'orders']">
-      
+
       <!-- Consumer Group Accordion -->
       <ion-accordion value="consumer-group" class="profile-accordion">
         <ion-item slot="header" class="accordion-header">
@@ -76,7 +76,7 @@
           <div class="group-selector" *ngIf="userGroups().length > 0">
             <ion-item>
               <ion-icon slot="start" name="swap-horizontal-outline"></ion-icon>
-              <ion-select 
+              <ion-select
                 [label]="'PROFILE.SELECT_GROUP' | translate"
                 [value]="currentGroup()?.id"
                 (ionChange)="onGroupChange($event)"
@@ -98,8 +98,8 @@
                   <p>{{ 'PROFILE.GROUP_NAME' | translate }}</p>
                   <h3>{{ currentGroup()?.name }}</h3>
                 </ion-label>
-                <ion-badge 
-                  [color]="isGroupOpen() ? 'success' : 'danger'" 
+                <ion-badge
+                  [color]="isGroupOpen() ? 'success' : 'danger'"
                   slot="end"
                 >
                   {{ (isGroupOpen() ? 'PROFILE.OPEN' : 'PROFILE.CLOSED') | translate }}
@@ -142,6 +142,31 @@
         </ion-item>
 
         <div slot="content" class="accordion-content">
+          <!-- Payment Status Tabs -->
+          <ion-segment [(ngModel)]="selectedPaymentTab" class="payment-tabs">
+            <ion-segment-button value="all">
+              <ion-label>Totes</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="unpaid">
+              <ion-label>
+                No pagades
+                <ion-badge *ngIf="unpaidCount() > 0">{{ unpaidCount() }}</ion-badge>
+              </ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="partial">
+              <ion-label>
+                Parcials
+                <ion-badge *ngIf="partialCount() > 0">{{ partialCount() }}</ion-badge>
+              </ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="paid">
+              <ion-label>
+                Pagades
+                <ion-badge *ngIf="paidCount() > 0">{{ paidCount() }}</ion-badge>
+              </ion-label>
+            </ion-segment-button>
+          </ion-segment>
+
           <div *ngIf="userOrders().length === 0" class="no-orders">
             <ion-icon name="cart-outline" class="no-orders-icon"></ion-icon>
             <p>{{ 'PROFILE.NO_ORDERS' | translate }}</p>
@@ -154,8 +179,8 @@
                   <span class="order-id">{{ 'PROFILE.ORDER' | translate }} #{{ order.id.slice(-8) }}</span>
                   <span class="order-date">{{ formatDate(order.createdAt) }}</span>
                 </div>
-                <ion-badge [color]="getOrderStatusColor(order.status)" class="order-status">
-                  {{ ('PROFILE.ORDER_STATUS_' + order.status.toUpperCase()) | translate }}
+                <ion-badge [color]="getPaymentStatusColor(order)" class="order-status">
+                  {{ getPaymentStatusLabel(order) | translate }}
                 </ion-badge>
               </div>
               <div class="order-summary">
@@ -171,9 +196,9 @@
 
     <!-- Logout Button -->
     <div class="logout-section">
-      <ion-button 
-        expand="block" 
-        color="danger" 
+      <ion-button
+        expand="block"
+        color="danger"
         (click)="confirmLogout()"
         [disabled]="isLoading()"
       >
@@ -209,8 +234,8 @@
                 <h2>{{ 'PROFILE.ORDER' | translate }} #{{ selectedOrder()!.id.slice(-8) }}</h2>
                 <p class="order-date-detail">{{ formatDate(selectedOrder()!.createdAt) }}</p>
               </div>
-              <ion-badge [color]="getOrderStatusColor(selectedOrder()!.status)" class="status-badge-large">
-                {{ ('PROFILE.ORDER_STATUS_' + selectedOrder()!.status.toUpperCase()) | translate }}
+              <ion-badge [color]="getPaymentStatusColor(selectedOrder()!)" class="status-badge-large">
+                {{ getPaymentStatusLabel(selectedOrder()!) | translate }}
               </ion-badge>
             </div>
           </div>
@@ -218,7 +243,7 @@
           <!-- Order Items -->
           <div class="items-section">
             <h3 class="section-title">{{ 'PROFILE.ORDER_ITEMS' | translate }} ({{ selectedOrder()!.items.length }})</h3>
-            
+
             <ion-card *ngFor="let item of selectedOrder()!.items" class="item-card">
               <div class="item-detail">
                 <!-- Item Header -->
@@ -248,7 +273,7 @@
                   <span>{{ item.article.producerName }}</span>
                   <span *ngIf="item.article?.city" class="city">· {{ item.article.city }}</span>
                 </div>
-                
+
                 <!-- Item Details -->
                 <div class="item-pricing">
                   <div class="pricing-row price-unit">

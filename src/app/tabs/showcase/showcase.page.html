@@ -206,107 +206,11 @@
     (didDismiss)="closeAddToCartModal()"
     class="add-to-cart-modal">
     <ng-template>
-      <ion-header>
-        <ion-toolbar color="primary">
-          <ion-title>{{ 'ADD_TO_CART_MODAL.TITLE' | translate }}</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="closeAddToCartModal()">
-              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-
-      <ion-content class="add-to-cart-content">
-        <div *ngIf="selectedArticle()" class="modal-body">
-          <!-- Article image -->
-          <div class="article-image-container" *ngIf="selectedArticle()?.image">
-            <img [src]="selectedArticle()!.image" [alt]="selectedArticle()!.product || selectedArticle()!.name" class="article-image">
-          </div>
-
-          <!-- Article info -->
-          <div class="article-info">
-            <div class="article-header">
-              <div class="article-title-section">
-                <span class="article-category">{{ selectedArticle()?.category }}</span>
-                <h2 class="article-name">{{ selectedArticle()?.product || selectedArticle()?.name }}</h2>
-                <p *ngIf="selectedArticle()?.variety" class="article-variety">{{ selectedArticle()!.variety }}</p>
-              </div>
-              <ion-badge *ngIf="selectedArticle()?.isSeasonal" color="success" class="seasonal-badge">
-                <ion-icon name="leaf-outline"></ion-icon>
-              </ion-badge>
-            </div>
-
-            <div class="article-details">
-              <div class="detail-row" *ngIf="selectedArticle()?.producerName">
-                <ion-icon name="person-outline"></ion-icon>
-                <span>{{ selectedArticle()!.producerName }}</span>
-              </div>
-              <div class="detail-row" *ngIf="selectedArticle()?.city">
-                <ion-icon name="location-outline"></ion-icon>
-                <span>{{ selectedArticle()!.city }}</span>
-              </div>
-            </div>
-
-            <div class="price-per-unit">
-              <span class="label">{{ 'ADD_TO_CART_MODAL.PRICE_PER_UNIT' | translate }}:</span>
-              <span class="value">{{ formatPrice(selectedArticle()!.pricePerUnit, selectedArticle()!.unitMeasure) }}</span>
-            </div>
-          </div>
-
-          <!-- Quantity selector -->
-          <div class="quantity-section">
-            <h3 class="section-title">{{ 'ADD_TO_CART_MODAL.QUANTITY' | translate }}</h3>
-
-            <div class="quantity-control">
-              <ion-button
-                fill="outline"
-                size="large"
-                (click)="decreaseQuantity()"
-                [disabled]="modalQuantity() <= getQuantityStep()">
-                <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
-              </ion-button>
-
-              <div class="quantity-display">
-                <input
-                  type="number"
-                  class="quantity-input"
-                  [value]="modalQuantity()"
-                  (input)="onModalQuantityChange($event)"
-                  [step]="getQuantityStep()"
-                  min="0">
-                <span class="unit">{{ selectedArticle()?.unitMeasure }}</span>
-              </div>
-
-              <ion-button
-                fill="outline"
-                size="large"
-                (click)="increaseQuantity()">
-                <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-              </ion-button>
-            </div>
-          </div>
-
-          <!-- Total price -->
-          <div class="total-section">
-            <div class="total-row">
-              <span class="total-label">{{ 'ADD_TO_CART_MODAL.TOTAL' | translate }}:</span>
-              <span class="total-price">{{ formatTotalPrice() }}</span>
-            </div>
-          </div>
-        </div>
-      </ion-content>
-
-      <ion-toolbar class="modal-footer">
-        <ion-button
-          expand="block"
-          color="secondary"
-          size="large"
-          (click)="confirmAddToCart()">
-          <ion-icon slot="start" name="cart-outline"></ion-icon>
-          {{ 'ADD_TO_CART_MODAL.ADD_BUTTON' | translate }}
-        </ion-button>
-      </ion-toolbar>
+      <app-add-to-cart-modal
+        [article]="selectedArticle()"
+        (close)="closeAddToCartModal()"
+        (addToCart)="onAddToCart($event)">
+      </app-add-to-cart-modal>
     </ng-template>
   </ion-modal>
 </ion-content>
