@@ -41,9 +41,14 @@
                   <h3 class="item-name">{{ item.article.product || item.article.name }}</h3>
                   <p *ngIf="item.article.variety" class="item-variety">{{ item.article.variety }}</p>
                 </div>
-                <ion-badge *ngIf="item.article.isSeasonal" color="success" class="seasonal-badge">
-                  <ion-icon name="leaf-outline"></ion-icon>
-                </ion-badge>
+                <div class="badges-container">
+                  <ion-badge *ngIf="item.article.isEco" color="success" class="eco-badge">
+                    <img src="assets/icon/recycle-solid-full.svg" alt="Ecològic" class="badge-icon" />
+                  </ion-badge>
+                  <ion-badge *ngIf="item.article.isSeasonal" color="success" class="seasonal-badge">
+                    <ion-icon name="leaf-outline" class="badge-icon"></ion-icon>
+                  </ion-badge>
+                </div>
               </div>
 
               <!-- Price per unit -->

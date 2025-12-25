@@ -145,23 +145,23 @@
           <!-- Payment Status Tabs -->
           <ion-segment [(ngModel)]="selectedPaymentTab" class="payment-tabs">
             <ion-segment-button value="all">
-              <ion-label>Totes</ion-label>
+              <ion-label>{{ 'PROFILE.ORDERS_TAB_ALL' | translate }}</ion-label>
             </ion-segment-button>
             <ion-segment-button value="unpaid">
               <ion-label>
-                No pagades
+                {{ 'PROFILE.ORDERS_TAB_UNPAID' | translate }}
                 <ion-badge *ngIf="unpaidCount() > 0">{{ unpaidCount() }}</ion-badge>
               </ion-label>
             </ion-segment-button>
             <ion-segment-button value="partial">
               <ion-label>
-                Parcials
+                {{ 'PROFILE.ORDERS_TAB_PARTIAL' | translate }}
                 <ion-badge *ngIf="partialCount() > 0">{{ partialCount() }}</ion-badge>
               </ion-label>
             </ion-segment-button>
             <ion-segment-button value="paid">
               <ion-label>
-                Pagades
+                {{ 'PROFILE.ORDERS_TAB_PAID' | translate }}
                 <ion-badge *ngIf="paidCount() > 0">{{ paidCount() }}</ion-badge>
               </ion-label>
             </ion-segment-button>
@@ -258,7 +258,7 @@
                   <div class="item-info">
                     <div class="item-title">
                       <span class="item-category">{{ item.article?.category || '' }}</span>
-                      <h4>{{ item.article?.product || item.article?.name || 'Article' }}</h4>
+                      <h4>{{ item.article?.product || ('PROFILE.ARTICLE' | translate) }}</h4>
                       <p *ngIf="item.article?.variety" class="item-variety">{{ item.article.variety }}</p>
                     </div>
                     <ion-badge *ngIf="item.article?.isSeasonal" color="success" class="seasonal-badge-small">

@@ -52,9 +52,6 @@ import { ShowcasePeriod, ShowcaseArticleItem } from '../../core/models/order-per
     IonSearchbar,
     IonCard,
     IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
     IonButton,
     IonIcon,
     IonBadge,
@@ -68,8 +65,7 @@ import { ShowcasePeriod, ShowcaseArticleItem } from '../../core/models/order-per
     IonItem,
     IonCheckbox,
     IonAccordionGroup,
-    IonAccordion,
-    IonText
+    IonAccordion
   ]
 })
 export class ShowcasePage implements OnInit {
@@ -90,8 +86,8 @@ export class ShowcasePage implements OnInit {
 
   // Computed: obtenir tots els articles de tots els períodes
   allArticles = computed(() => {
-    return this.allPeriods().flatMap(period =>
-      period.articles.map(article => ({
+    return this.allPeriods().flatMap((period: ShowcasePeriod) =>
+      period.articles.map((article: ShowcaseArticleItem) => ({
         ...article,
         periodId: period.periodId,
         periodName: period.periodName
@@ -113,7 +109,7 @@ export class ShowcasePage implements OnInit {
     const categoryMap = new Map<string, Set<string>>();
     const productVarietyMap = new Map<string, Set<string>>();
 
-    articles.forEach(article => {
+    articles.forEach((article: ShowcaseArticleItem & { periodId?: string; periodName?: string }) => {
       const category = article.category || 'Sin categoría';
       const product = article.product || 'Sin producto';
       const variety = article.variety;
@@ -160,7 +156,7 @@ export class ShowcasePage implements OnInit {
 
       // Filtre per cerca
       if (search) {
-        articles = articles.filter(article =>
+        articles = articles.filter((article: ShowcaseArticleItem) =>
           article.product?.toLowerCase().includes(search) ||
           article.variety?.toLowerCase().includes(search) ||
           article.description?.toLowerCase().includes(search) ||
@@ -172,24 +168,24 @@ export class ShowcasePage implements OnInit {
       // Filtre per categories
       const categories = this.selectedCategories();
       if (categories.length > 0) {
-        articles = articles.filter(article => article.category && categories.includes(article.category));
+        articles = articles.filter((article: ShowcaseArticleItem) => article.category && categories.includes(article.category));
       }
 
       // Filtre per productes
       const products = this.selectedProducts();
       if (products.length > 0) {
-        articles = articles.filter(article => article.product && products.includes(article.product));
+        articles = articles.filter((article: ShowcaseArticleItem) => article.product && products.includes(article.product));
       }
 
       // Filtre per varietats
       const varieties = this.selectedVarieties();
       if (varieties.length > 0) {
-        articles = articles.filter(article => article.variety && varieties.includes(article.variety));
+        articles = articles.filter((article: ShowcaseArticleItem) => article.variety && varieties.includes(article.variety));
       }
 
       // Filtre per temporada
       if (this.showSeasonalOnly()) {
-        articles = articles.filter(article => article.isSeasonal);
+        articles = articles.filter((article: ShowcaseArticleItem) => article.isSeasonal);
       }
 
       return { ...period, articles };
@@ -236,27 +232,30 @@ export class ShowcasePage implements OnInit {
     }
 
     this.showcaseService.getShowcasePeriods(currentGroup.id).subscribe({
-      next: (periods) => {
-        console.log('Periods:', periods);
+      next: (periods: ShowcasePeriod[]) => {
+        console.log('[Showcase] Received periods:', periods);
+        console.log('[Showcase] Total periods:', periods.length);
+        console.log('[Showcase] Total articles:', periods.reduce((sum, p) => sum + (p.articles?.length || 0), 0));
         this.allPeriods.set(periods);
+        console.log('[Showcase] allArticles computed:', this.allArticles().length);
         this.isLoading.set(false);
       },
-      error: (error) => {
-        console.error('Error loading showcase periods:', error);
+      error: (error: any) => {
+        console.error('[Showcase] Error loading showcase periods:', error);
         this.isLoading.set(false);
       }
     });
   }
 
-  handleRefresh(event: any) {
+  handleRefresh(event: CustomEvent) {
     this.loadPeriods();
     setTimeout(() => {
-      event.target.complete();
+      (event.target as any).complete();
     }, 500);
   }
 
-  onSearchChange(event: any) {
-    this.searchText.set(event.target.value || '');
+  onSearchChange(event: CustomEvent) {
+    this.searchText.set((event.target as HTMLIonSearchbarElement).value || '');
   }
 
   // Filtres
@@ -376,8 +375,8 @@ export class ShowcasePage implements OnInit {
     }
   }
 
-  onModalQuantityChange(event: any) {
-    const value = parseFloat(event.target.value);
+  onModalQuantityChange(event: Event) {
+    const value = parseFloat((event.target as HTMLInputElement).value);
     if (!isNaN(value) && value >= 0) {
       this.modalQuantity.set(value);
     }

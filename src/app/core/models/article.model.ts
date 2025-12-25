@@ -24,6 +24,7 @@ export interface Article {
   consumerGroupId: string;
   inShowcase: boolean;
   isSeasonal: boolean;
+  isEco?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
   // Campos adicionales para el aparador

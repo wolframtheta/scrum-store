@@ -57,6 +57,19 @@
     "CANCEL_BUTTON": "Cancel·lar",
     "STOCK_ERROR": "La quantitat excedeix l'estoc disponible."
   },
+  "CART": {
+    "EMPTY_TITLE": "La cistella està buida",
+    "EMPTY_MESSAGE": "Afegeix articles des de l'aparador per començar",
+    "SUBTOTAL": "Subtotal",
+    "TOTAL": "Total",
+    "CONFIRM_ORDER": "Tramitar comanda",
+    "ITEM_REMOVED": "Article eliminat de la cistella",
+    "EMPTY_CART": "La cistella està buida",
+    "CONFIRM_ORDER_TITLE": "Confirmar comanda",
+    "CONFIRM_ORDER_MESSAGE": "Estàs segur que vols tramitar aquesta comanda?",
+    "CONFIRM_BUTTON": "Confirmar",
+    "ORDER_SUCCESS": "Comanda tramitada correctament"
+  },
   "TABS": {
     "APARADOR": "Aparador",
     "CISTELLA": "Cistella",
@@ -79,7 +92,26 @@
     "LOGOUT": "Tancar sessió",
     "LOGOUT_CONFIRM_TITLE": "Tancar sessió?",
     "LOGOUT_CONFIRM_MESSAGE": "Estàs segur que vols tancar la sessió?",
-    "LOGOUT_ERROR": "Error en tancar la sessió"
+    "LOGOUT_ERROR": "Error en tancar la sessió",
+    "MY_ORDERS": "Les meves comandes",
+    "NO_ORDERS": "No tens comandes",
+    "ORDER": "Comanda",
+    "ITEMS": "articles",
+    "ORDER_DETAIL": "Detall de la comanda",
+    "ORDER_ITEMS": "Articles de la comanda",
+    "PRICE_PER_UNIT": "Preu per unitat",
+    "QUANTITY": "Quantitat",
+    "SUBTOTAL": "Subtotal",
+    "TOTAL": "Total",
+    "ORDER_STATUS_PENDING": "Pendent",
+    "PAYMENT_STATUS_PAID": "Pagada",
+    "PAYMENT_STATUS_PARTIAL": "Parcialment pagada",
+    "PAYMENT_STATUS_UNPAID": "No pagada",
+    "ORDERS_TAB_ALL": "Totes",
+    "ORDERS_TAB_UNPAID": "No pagades",
+    "ORDERS_TAB_PARTIAL": "Parcials",
+    "ORDERS_TAB_PAID": "Pagades",
+    "ARTICLE": "Article"
   },
   "COMMON": {
     "WELCOME": "Benvingut",

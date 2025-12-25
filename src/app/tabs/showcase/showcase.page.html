@@ -145,7 +145,7 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading() && articles().length === 0" class="empty-state">
+  <div *ngIf="!isLoading() && allArticles().length === 0" class="empty-state">
     <div class="empty-icon-wrapper">
       <ion-icon name="storefront-outline" class="empty-icon"></ion-icon>
     </div>
@@ -156,19 +156,24 @@
   </div>
 
   <!-- Articles List -->
-  <div *ngIf="!isLoading() && articles().length > 0" class="articles-container">
-    <ion-card *ngFor="let article of articles()" class="article-card">
+  <div *ngIf="!isLoading() && allArticles().length > 0" class="articles-container">
+    <ion-card *ngFor="let article of allArticles()" class="article-card">
       <ion-card-content>
-        <!-- Header with category and seasonal badge -->
+        <!-- Header with category and badges -->
         <div class="card-header">
           <span class="article-category">{{ article.category || 'General' }}</span>
-          <ion-badge *ngIf="article.isSeasonal" class="seasonal-badge" color="success">
-            <ion-icon name="leaf-outline"></ion-icon>
-          </ion-badge>
+          <div class="badges-container">
+            <ion-badge *ngIf="article.isEco" class="eco-badge" color="success">
+              <img src="assets/icon/recycle-solid-full.svg" alt="Ecològic" class="badge-icon" />
+            </ion-badge>
+            <ion-badge *ngIf="article.isSeasonal" class="seasonal-badge" color="success">
+              <ion-icon name="leaf-outline" class="badge-icon"></ion-icon>
+            </ion-badge>
+          </div>
         </div>
 
         <!-- Title -->
-        <h2 class="article-title">{{ article.product || article.name }}</h2>
+        <h2 class="article-title">{{ article.product }}</h2>
         <p *ngIf="article.variety" class="article-variety">{{ article.variety }}</p>
 
         <!-- Info compact -->
@@ -189,7 +194,7 @@
             <span class="price">{{ formatPrice(article.pricePerUnit, article.unitMeasure) }}</span>
           </div>
           <ion-button
-            (click)="addToCart(article, $event)"
+            (click)="addToCart(article, article.periodId, $event)"
             color="secondary"
             size="small"
             class="add-button">
@@ -206,11 +211,44 @@
     (didDismiss)="closeAddToCartModal()"
     class="add-to-cart-modal">
     <ng-template>
-      <app-add-to-cart-modal
-        [article]="selectedArticle()"
-        (close)="closeAddToCartModal()"
-        (addToCart)="onAddToCart($event)">
-      </app-add-to-cart-modal>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ 'SHOWCASE.ADD_TO_CART' | translate }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeAddToCartModal()">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div *ngIf="selectedArticle()" class="modal-content">
+          <h2>{{ selectedArticle()!.product }}</h2>
+          <p *ngIf="selectedArticle()!.variety">{{ selectedArticle()!.variety }}</p>
+          <p class="price">{{ formatPrice(selectedArticle()!.pricePerUnit, selectedArticle()!.unitMeasure) }}</p>
+          
+          <div class="quantity-controls">
+            <ion-button (click)="decreaseQuantity()" fill="outline">
+              <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+            </ion-button>
+            <input 
+              type="number" 
+              [value]="modalQuantity()" 
+              (input)="onModalQuantityChange($event)"
+              min="0"
+              step="0.5">
+            <ion-button (click)="increaseQuantity()" fill="outline">
+              <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+            </ion-button>
+          </div>
+          
+          <p class="total-price">{{ formatTotalPrice() }}</p>
+          
+          <ion-button expand="block" (click)="confirmAddToCart()" [disabled]="modalQuantity() <= 0">
+            {{ 'SHOWCASE.ADD_TO_CART' | translate }}
+          </ion-button>
+        </div>
+      </ion-content>
     </ng-template>
   </ion-modal>
 </ion-content>

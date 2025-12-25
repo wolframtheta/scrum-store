@@ -41,7 +41,12 @@ import {
   timeOutline,
   swapHorizontalOutline,
   receiptOutline,
-  cartOutline
+  cartOutline,
+  calculatorOutline,
+  leafOutline,
+  pricetagOutline,
+  cubeOutline,
+  closeOutline
 } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { ConsumerGroupService } from '../../core/services/consumer-group.service';
@@ -99,26 +104,27 @@ export class ProfilePage implements OnInit {
 
     if (tab === 'all') return allOrders;
 
-    return allOrders.filter(order => {
+
+    return allOrders.filter((order: Order) => {
       if (!order.paymentStatus) return tab === 'unpaid'; // Old orders without paymentStatus
       return order.paymentStatus === tab;
     });
   });
 
   unpaidCount = computed(() =>
-    this.ordersService.getUserOrders().filter(o =>
+    this.ordersService.getUserOrders().filter((o: Order) =>
       !o.paymentStatus || o.paymentStatus === PaymentStatus.UNPAID
     ).length
   );
 
   partialCount = computed(() =>
-    this.ordersService.getUserOrders().filter(o =>
+    this.ordersService.getUserOrders().filter((o: Order) =>
       o.paymentStatus === PaymentStatus.PARTIAL
     ).length
   );
 
   paidCount = computed(() =>
-    this.ordersService.getUserOrders().filter(o =>
+    this.ordersService.getUserOrders().filter((o: Order) =>
       o.paymentStatus === PaymentStatus.PAID
     ).length
   );
@@ -148,7 +154,12 @@ export class ProfilePage implements OnInit {
       timeOutline,
       swapHorizontalOutline,
       receiptOutline,
-      cartOutline
+      cartOutline,
+      calculatorOutline,
+      leafOutline,
+      pricetagOutline,
+      cubeOutline,
+      closeOutline
     });
   }
 
@@ -266,8 +277,30 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  formatPrice(price: number): string {
-    return `${price.toFixed(2).replace('.', ',')} €`;
+  formatPrice(price: number | string | undefined | null): string {
+    // Handle null/undefined
+    if (price === undefined || price === null) {
+      return '0,00 €';
+    }
+    
+    // Convert to number
+    let numPrice: number;
+    if (typeof price === 'string') {
+      const parsed = parseFloat(price);
+      if (isNaN(parsed)) {
+        return '0,00 €';
+      }
+      numPrice = parsed;
+    } else {
+      numPrice = price;
+    }
+    
+    // Final safety check before toFixed
+    if (typeof numPrice !== 'number' || isNaN(numPrice) || !isFinite(numPrice)) {
+      return '0,00 €';
+    }
+    
+    return `${numPrice.toFixed(2).replace('.', ',')} €`;
   }
 
   getOrderStatusColor(status?: string): string {

@@ -56,6 +56,19 @@
     "CANCEL_BUTTON": "Cancelar",
     "STOCK_ERROR": "La cantidad excede el stock disponible."
   },
+  "CART": {
+    "EMPTY_TITLE": "La cesta está vacía",
+    "EMPTY_MESSAGE": "Añade artículos desde el escaparate para comenzar",
+    "SUBTOTAL": "Subtotal",
+    "TOTAL": "Total",
+    "CONFIRM_ORDER": "Tramitar pedido",
+    "ITEM_REMOVED": "Artículo eliminado de la cesta",
+    "EMPTY_CART": "La cesta está vacía",
+    "CONFIRM_ORDER_TITLE": "Confirmar pedido",
+    "CONFIRM_ORDER_MESSAGE": "¿Estás seguro de que quieres tramitar este pedido?",
+    "CONFIRM_BUTTON": "Confirmar",
+    "ORDER_SUCCESS": "Pedido tramitado correctamente"
+  },
   "TABS": {
     "APARADOR": "Escaparate",
     "CISTELLA": "Cesta",
@@ -78,7 +91,26 @@
     "LOGOUT": "Cerrar sesión",
     "LOGOUT_CONFIRM_TITLE": "¿Cerrar sesión?",
     "LOGOUT_CONFIRM_MESSAGE": "¿Estás seguro de que quieres cerrar sesión?",
-    "LOGOUT_ERROR": "Error al cerrar sesión"
+    "LOGOUT_ERROR": "Error al cerrar sesión",
+    "MY_ORDERS": "Mis pedidos",
+    "NO_ORDERS": "No tienes pedidos",
+    "ORDER": "Pedido",
+    "ITEMS": "artículos",
+    "ORDER_DETAIL": "Detalle del pedido",
+    "ORDER_ITEMS": "Artículos del pedido",
+    "PRICE_PER_UNIT": "Precio por unidad",
+    "QUANTITY": "Cantidad",
+    "SUBTOTAL": "Subtotal",
+    "TOTAL": "Total",
+    "ORDER_STATUS_PENDING": "Pendiente",
+    "PAYMENT_STATUS_PAID": "Pagado",
+    "PAYMENT_STATUS_PARTIAL": "Parcialmente pagado",
+    "PAYMENT_STATUS_UNPAID": "No pagado",
+    "ORDERS_TAB_ALL": "Todos",
+    "ORDERS_TAB_UNPAID": "No pagados",
+    "ORDERS_TAB_PARTIAL": "Parciales",
+    "ORDERS_TAB_PAID": "Pagados",
+    "ARTICLE": "Artículo"
   },
   "COMMON": {
     "WELCOME": "Bienvenido",

@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { ApiService } from './api.service';
 import { Article } from '../models/article.model';
+import { ShowcasePeriod } from '../models/order-period.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,13 @@ export class ShowcaseService {
 
   getCurrentGroupId(): string | null {
     return this.currentGroupId();
+  }
+
+  /**
+   * Obtener períodos abiertos del aparador (nueva arquitectura)
+   */
+  getShowcasePeriods(groupId: string): Observable<ShowcasePeriod[]> {
+    return this.apiService.get<ShowcasePeriod[]>(`/consumer-groups/${groupId}/supply-schedules/showcase`);
   }
 
   /**
