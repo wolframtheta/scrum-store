@@ -28,7 +28,7 @@
       </div>
 
       <div class="forgot-password">
-        <a href="#" class="forgot-link">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
+        <a [routerLink]="['/reset-password']" [queryParams]="{ returnUrl: '/login' }" class="forgot-link">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
       </div>
 
       <ion-button

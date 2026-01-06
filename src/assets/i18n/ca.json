@@ -113,6 +113,23 @@
     "ORDERS_TAB_PAID": "Pagades",
     "ARTICLE": "Article"
   },
+  "RESET_PASSWORD": {
+    "TITLE": "Restablir contrasenya",
+    "SUBTITLE": "Introdueix el teu correu i una nova contrasenya",
+    "EMAIL_PLACEHOLDER": "Correu electrònic",
+    "PASSWORD_PLACEHOLDER": "Nova contrasenya",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Repeteix la contrasenya",
+    "EMAIL_REQUIRED": "El correu electrònic és obligatori",
+    "EMAIL_INVALID": "Introdueix un correu vàlid",
+    "PASSWORD_REQUIRED": "La contrasenya és obligatòria",
+    "PASSWORD_MIN_LENGTH": "Mínim 6 caràcters",
+    "CONFIRM_PASSWORD_REQUIRED": "Has de confirmar la contrasenya",
+    "PASSWORDS_NOT_MATCH": "Les contrasenyes no coincideixen",
+    "SUBMIT_BUTTON": "RESTABLIR CONTRASENYA",
+    "BACK_TO_LOGIN": "Tornar al login",
+    "SUCCESS": "Contrasenya restablida correctament",
+    "ERROR": "Error en restablir la contrasenya"
+  },
   "COMMON": {
     "WELCOME": "Benvingut",
     "WELCOME_FEMALE": "Benvinguda",

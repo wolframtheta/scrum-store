@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import {
   IonContent,
   IonButton,
@@ -26,6 +26,7 @@ import { firstValueFrom } from 'rxjs';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     TranslateModule,
     IonContent,
     IonButton,
@@ -140,7 +141,7 @@ export class LoginPage implements OnInit {
     const toast = await this.toastController.create({
       message,
       duration: 2000,
-      position: 'bottom',
+      position: 'top',
       color
     });
     await toast.present();

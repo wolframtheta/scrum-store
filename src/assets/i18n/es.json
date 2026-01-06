@@ -112,6 +112,23 @@
     "ORDERS_TAB_PAID": "Pagados",
     "ARTICLE": "Artículo"
   },
+  "RESET_PASSWORD": {
+    "TITLE": "Restablecer contraseña",
+    "SUBTITLE": "Introduce tu correo y una nueva contraseña",
+    "EMAIL_PLACEHOLDER": "Correo electrónico",
+    "PASSWORD_PLACEHOLDER": "Nueva contraseña",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Repite la contraseña",
+    "EMAIL_REQUIRED": "El correo electrónico es obligatorio",
+    "EMAIL_INVALID": "Introduce un correo válido",
+    "PASSWORD_REQUIRED": "La contraseña es obligatoria",
+    "PASSWORD_MIN_LENGTH": "Mínimo 6 caracteres",
+    "CONFIRM_PASSWORD_REQUIRED": "Debes confirmar la contraseña",
+    "PASSWORDS_NOT_MATCH": "Las contraseñas no coinciden",
+    "SUBMIT_BUTTON": "RESTABLECER CONTRASEÑA",
+    "BACK_TO_LOGIN": "Volver al login",
+    "SUCCESS": "Contraseña restablecida correctamente",
+    "ERROR": "Error al restablecer la contraseña"
+  },
   "COMMON": {
     "WELCOME": "Bienvenido",
     "LOADING": "Cargando...",

@@ -182,6 +182,14 @@ ion-accordion-group {
 
 .group-info {
   background: white;
+  border-radius: 12px;
+  padding: 8px;
+  margin: 8px 0;
+
+  ion-list {
+    background: white;
+    border-radius: 12px;
+  }
 
   ion-item {
     --padding-start: 0;

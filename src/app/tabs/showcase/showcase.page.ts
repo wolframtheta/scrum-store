@@ -450,7 +450,7 @@ export class ShowcasePage implements OnInit {
     const toast = await this.toastController.create({
       message,
       duration: 2000,
-      position: 'bottom',
+      position: 'top',
       color
     });
     await toast.present();
