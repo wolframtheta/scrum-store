@@ -82,11 +82,22 @@ export class ShowcasePage implements OnInit {
   selectedCategories = signal<string[]>([]);
   selectedProducts = signal<string[]>([]);
   selectedVarieties = signal<string[]>([]);
-  showSeasonalOnly = signal<boolean>(false);
+  showEcoOnly = signal<boolean>(false);
 
   // Computed: obtenir tots els articles de tots els períodes
   allArticles = computed(() => {
     return this.allPeriods().flatMap((period: ShowcasePeriod) =>
+      period.articles.map((article: ShowcaseArticleItem) => ({
+        ...article,
+        periodId: period.periodId,
+        periodName: period.periodName
+      }))
+    );
+  });
+
+  // Computed: obtenir articles filtrats
+  filteredArticles = computed(() => {
+    return this.filteredPeriods().flatMap((period: ShowcasePeriod) =>
       period.articles.map((article: ShowcaseArticleItem) => ({
         ...article,
         periodId: period.periodId,
@@ -147,7 +158,7 @@ export class ShowcasePage implements OnInit {
 
     if (!search && this.selectedCategories().length === 0 &&
         this.selectedProducts().length === 0 && this.selectedVarieties().length === 0 &&
-        !this.showSeasonalOnly()) {
+        !this.showEcoOnly()) {
       return periods;
     }
 
@@ -183,9 +194,9 @@ export class ShowcasePage implements OnInit {
         articles = articles.filter((article: ShowcaseArticleItem) => article.variety && varieties.includes(article.variety));
       }
 
-      // Filtre per temporada
-      if (this.showSeasonalOnly()) {
-        articles = articles.filter((article: ShowcaseArticleItem) => article.isSeasonal);
+      // Filtre per ecològic
+      if (this.showEcoOnly()) {
+        articles = articles.filter((article: ShowcaseArticleItem) => article.isEco === true);
       }
 
       return { ...period, articles };
@@ -308,8 +319,8 @@ export class ShowcasePage implements OnInit {
     return categoryGroup.products.map((_, j) => `product-${categoryIndex}-${j}`);
   }
 
-  toggleSeasonalFilter() {
-    this.showSeasonalOnly.set(!this.showSeasonalOnly());
+  toggleEcoFilter() {
+    this.showEcoOnly.set(!this.showEcoOnly());
   }
 
   openFiltersModal() {
@@ -328,16 +339,16 @@ export class ShowcasePage implements OnInit {
     this.selectedCategories.set([]);
     this.selectedProducts.set([]);
     this.selectedVarieties.set([]);
-    this.showSeasonalOnly.set(false);
+    this.showEcoOnly.set(false);
     this.searchText.set('');
   }
 
   hasActiveFilters = computed(() => {
-    return this.selectedCategories().length > 0 || this.selectedProducts().length > 0 || this.selectedVarieties().length > 0 || this.showSeasonalOnly() || !!this.searchText();
+    return this.selectedCategories().length > 0 || this.selectedProducts().length > 0 || this.selectedVarieties().length > 0 || this.showEcoOnly() || !!this.searchText();
   });
 
   activeFiltersCount = computed(() => {
-    return this.selectedCategories().length + this.selectedProducts().length + this.selectedVarieties().length + (this.showSeasonalOnly() ? 1 : 0);
+    return this.selectedCategories().length + this.selectedProducts().length + this.selectedVarieties().length + (this.showEcoOnly() ? 1 : 0);
   });
 
   // Carreto
@@ -427,6 +438,7 @@ export class ShowcasePage implements OnInit {
         variety: article.variety,
         category: article.category,
         pricePerUnit: article.pricePerUnit,
+        taxRate: article.taxRate,
         unitMeasure: article.unitMeasure,
         image: article.image,
         producerName: article.producerName,
@@ -456,10 +468,15 @@ export class ShowcasePage implements OnInit {
     await toast.present();
   }
 
-  formatPrice(price: number | string, unit: string): string {
+  formatPrice(price: number | string, unit?: string): string {
     const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-    if (isNaN(numPrice)) return '0,00 €/' + unit;
-    return `${numPrice.toFixed(2).replace('.', ',')} €/${unit}`;
+    if (isNaN(numPrice)) {
+      return unit ? '0,00 €/' + unit : '0,00 €';
+    }
+    if (unit) {
+      return `${numPrice.toFixed(2).replace('.', ',')} €/${unit}`;
+    }
+    return `${numPrice.toFixed(2).replace('.', ',')} €`;
   }
 
   formatTotalPrice(): string {
@@ -468,9 +485,35 @@ export class ShowcasePage implements OnInit {
 
     const price = article.pricePerUnit;
     const quantity = this.modalQuantity();
+    const taxRate = article.taxRate || 0;
 
-    const total = price * quantity;
-    return `${total.toFixed(2).replace('.', ',')} €`;
+    const totalWithoutTax = price * quantity;
+    const taxAmount = totalWithoutTax * (taxRate / 100);
+    const totalWithTax = totalWithoutTax + taxAmount;
+
+    if (taxRate > 0) {
+      return `${totalWithTax.toFixed(2).replace('.', ',')} € (${totalWithoutTax.toFixed(2).replace('.', ',')} € + ${taxAmount.toFixed(2).replace('.', ',')} € IVA)`;
+    }
+    return `${totalWithTax.toFixed(2).replace('.', ',')} €`;
+  }
+
+  getTotalWithoutTax(): number {
+    const article = this.selectedArticle();
+    if (!article) return 0;
+    return article.pricePerUnit * this.modalQuantity();
+  }
+
+  getTaxAmount(): number {
+    const article = this.selectedArticle();
+    if (!article || !article.taxRate) return 0;
+    const totalWithoutTax = this.getTotalWithoutTax();
+    return totalWithoutTax * (article.taxRate / 100);
+  }
+
+  getTotalWithTax(): number {
+    const article = this.selectedArticle();
+    if (!article) return 0;
+    return this.getTotalWithoutTax() + this.getTaxAmount();
   }
 
   // Helpers per dates

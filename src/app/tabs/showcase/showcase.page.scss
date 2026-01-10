@@ -122,6 +122,14 @@
         margin: 0;
       }
 
+      // Image icons inside chips (for eco filter)
+      .chip-icon {
+        width: 18px;
+        height: 18px;
+        display: block;
+        filter: brightness(0);
+      }
+
       // Labels inside chips
       ion-label {
         font-weight: 700;
@@ -152,7 +160,7 @@
         }
       }
 
-      // Success chip (selected seasonal)
+      // Success chip (selected eco)
       &[color="success"]:not([outline]) {
         background: var(--ion-color-success);
         color: white;
@@ -161,6 +169,10 @@
         ion-icon,
         ion-label {
           color: white;
+        }
+
+        .chip-icon {
+          filter: brightness(0) invert(1);
         }
       }
 
@@ -382,6 +394,73 @@
     gap: 1.5rem;
     padding: 1.5rem 0;
 
+    .article-image-container {
+      width: 100%;
+      max-height: 200px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+      .article-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .article-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+
+      .article-badges {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+
+        .eco-badge,
+        .seasonal-badge {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          font-size: 0.65rem;
+          font-weight: 700;
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
+          min-width: 32px;
+          min-height: 32px;
+
+          .badge-icon {
+            width: 18px;
+            height: 18px;
+            display: block;
+            filter: brightness(0) invert(1);
+          }
+
+          ion-icon {
+            font-size: 18px;
+            color: white;
+          }
+        }
+      }
+
+      .article-category {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+      }
+    }
+
     h2 {
       color: white;
       font-size: 1.75rem;
@@ -390,18 +469,70 @@
       line-height: 1.3;
     }
 
-    p {
-      color: rgba(255, 255, 255, 0.9);
+    .article-variety {
+      color: rgba(255, 255, 255, 0.85);
       font-size: 1rem;
-      margin: 0;
+      margin: 0.25rem 0 0 0;
       font-weight: 500;
+      font-style: italic;
     }
 
-    .price {
-      color: var(--ion-color-secondary);
-      font-size: 1.25rem;
-      font-weight: 700;
+    .article-description {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.95rem;
       margin: 0.5rem 0 0 0;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .article-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-radius: 12px;
+      margin: 0.5rem 0;
+
+      .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.9rem;
+        font-weight: 500;
+
+        ion-icon {
+          font-size: 1.125rem;
+          color: var(--ion-color-secondary);
+          flex-shrink: 0;
+        }
+
+        .city {
+          color: rgba(255, 255, 255, 0.7);
+        }
+      }
+    }
+
+    .price-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin: 0.5rem 0;
+
+      .price {
+        color: var(--ion-color-secondary);
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .tax-rate {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+        margin: 0;
+      }
     }
 
     .quantity-controls {
@@ -464,16 +595,49 @@
       }
     }
 
-    .total-price {
-      background: var(--ion-color-tertiary);
-      color: white;
-      font-size: 1.75rem;
-      font-weight: 800;
-      text-align: center;
-      padding: 1.25rem;
+    .price-breakdown {
+      background: white;
       border-radius: 16px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      padding: 1.25rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       margin: 0.5rem 0;
+
+      .price-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &.final {
+          border-top: 2px solid var(--ion-color-primary);
+          margin-top: 0.5rem;
+          padding-top: 0.75rem;
+          font-weight: 700;
+        }
+
+        .price-label {
+          color: var(--ion-color-dark);
+          font-size: 0.95rem;
+          font-weight: 500;
+        }
+
+        .price-value {
+          color: var(--ion-color-primary);
+          font-size: 1.1rem;
+          font-weight: 600;
+
+          &.final {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--ion-color-secondary);
+          }
+        }
+      }
     }
 
     ion-button[expand="block"] {
@@ -598,10 +762,47 @@
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: white;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+    transform: translateY(-4px) scale(1.02);
+    border-color: var(--ion-color-primary);
+  }
 
   &:active {
-    transform: translateY(2px);
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.16);
+    transform: translateY(-1px) scale(0.98);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    border-color: var(--ion-color-primary);
+    background: var(--ion-color-light);
+  }
+
+  // Ripple effect on click
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(var(--ion-color-primary-rgb), 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &:active::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  ion-card-content {
+    position: relative;
+    z-index: 1;
   }
 
   ion-card-content {
@@ -711,13 +912,16 @@
     .article-footer {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: 0.75rem;
       margin-top: auto;
       padding-top: 0.75rem;
       border-top: 1px solid rgba(0, 0, 0, 0.06);
 
       .price-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
         flex: 1;
 
         .price {
@@ -726,25 +930,11 @@
           font-weight: 800;
           line-height: 1;
         }
-      }
 
-      .add-button {
-        --border-radius: 10px;
-        --padding-start: 0;
-        --padding-end: 0;
-        --box-shadow: 0 4px 12px rgba(var(--ion-color-secondary-rgb), 0.3);
-        height: 42px;
-        width: 42px;
-        min-width: 42px;
-        flex-shrink: 0;
-        margin: 0;
-
-        ion-icon {
-          font-size: 1.375rem;
-        }
-
-        &:active {
-          --box-shadow: 0 2px 6px rgba(var(--ion-color-secondary-rgb), 0.4);
+        .tax-rate {
+          font-size: 0.75rem;
+          color: var(--ion-color-primary);
+          font-weight: 500;
         }
       }
     }

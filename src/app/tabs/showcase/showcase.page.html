@@ -19,13 +19,13 @@
   <!-- Filters toolbar -->
   <ion-toolbar class="filters-toolbar">
     <div class="filters-container">
-      <!-- Seasonal filter -->
+      <!-- Eco filter -->
       <ion-chip
-        [outline]="!showSeasonalOnly()"
-        [color]="showSeasonalOnly() ? 'success' : 'medium'"
-        (click)="toggleSeasonalFilter()">
-        <ion-icon name="leaf-outline"></ion-icon>
-        <ion-label>{{ 'SHOWCASE.SEASONAL' | translate }}</ion-label>
+        [outline]="!showEcoOnly()"
+        [color]="showEcoOnly() ? 'success' : 'medium'"
+        (click)="toggleEcoFilter()">
+        <img src="assets/icon/recycle-solid-full.svg" alt="Ecològic" class="chip-icon" />
+        <ion-label>{{ 'SHOWCASE.ECO' | translate }}</ion-label>
       </ion-chip>
 
       <!-- Filters button with badge and clear button -->
@@ -145,19 +145,19 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading() && allArticles().length === 0" class="empty-state">
+  <div *ngIf="!isLoading() && filteredArticles().length === 0" class="empty-state">
     <div class="empty-icon-wrapper">
       <ion-icon name="storefront-outline" class="empty-icon"></ion-icon>
     </div>
     <h2 class="empty-title">{{ 'SHOWCASE.NO_ARTICLES' | translate }}</h2>
     <p class="empty-description">
-      {{ searchText() ? ('SHOWCASE.NO_RESULTS' | translate) : ('SHOWCASE.NO_ARTICLES_DESC' | translate) }}
+      {{ searchText() || hasActiveFilters() ? ('SHOWCASE.NO_RESULTS' | translate) : ('SHOWCASE.NO_ARTICLES_DESC' | translate) }}
     </p>
   </div>
 
   <!-- Articles List -->
-  <div *ngIf="!isLoading() && allArticles().length > 0" class="articles-container">
-    <ion-card *ngFor="let article of allArticles()" class="article-card">
+  <div *ngIf="!isLoading() && filteredArticles().length > 0" class="articles-container">
+    <ion-card *ngFor="let article of filteredArticles()" class="article-card" (click)="addToCart(article, article.periodId, $event)">
       <ion-card-content>
         <!-- Header with category and badges -->
         <div class="card-header">
@@ -188,18 +188,12 @@
           </div>
         </div>
 
-        <!-- Footer with price and button -->
+        <!-- Footer with price -->
         <div class="article-footer">
           <div class="price-section">
             <span class="price">{{ formatPrice(article.pricePerUnit, article.unitMeasure) }}</span>
+            <span *ngIf="article.taxRate" class="tax-rate">IVA {{ article.taxRate }}%</span>
           </div>
-          <ion-button
-            (click)="addToCart(article, article.periodId, $event)"
-            color="secondary"
-            size="small"
-            class="add-button">
-            <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-          </ion-button>
         </div>
       </ion-card-content>
     </ion-card>
@@ -223,9 +217,49 @@
       </ion-header>
       <ion-content>
         <div *ngIf="selectedArticle()" class="modal-content">
+          <!-- Article Image -->
+          <div *ngIf="selectedArticle()!.image" class="article-image-container">
+            <img [src]="selectedArticle()!.image" [alt]="selectedArticle()!.product" class="article-image">
+          </div>
+          
+          <!-- Article Header -->
+          <div class="article-header">
+            <div class="article-badges">
+              <ion-badge *ngIf="selectedArticle()!.isEco" color="success" class="eco-badge">
+                <img src="assets/icon/recycle-solid-full.svg" alt="Ecològic" class="badge-icon" />
+              </ion-badge>
+              <ion-badge *ngIf="selectedArticle()!.isSeasonal" color="success" class="seasonal-badge">
+                <ion-icon name="leaf-outline" class="badge-icon"></ion-icon>
+              </ion-badge>
+            </div>
+            <span *ngIf="selectedArticle()!.category" class="article-category">{{ selectedArticle()!.category }}</span>
+          </div>
+          
+          <!-- Article Title -->
           <h2>{{ selectedArticle()!.product }}</h2>
-          <p *ngIf="selectedArticle()!.variety">{{ selectedArticle()!.variety }}</p>
-          <p class="price">{{ formatPrice(selectedArticle()!.pricePerUnit, selectedArticle()!.unitMeasure) }}</p>
+          <p *ngIf="selectedArticle()!.variety" class="article-variety">{{ selectedArticle()!.variety }}</p>
+          
+          <!-- Article Description -->
+          <p *ngIf="selectedArticle()!.description" class="article-description">{{ selectedArticle()!.description }}</p>
+          
+          <!-- Article Info -->
+          <div *ngIf="selectedArticle()!.producerName || selectedArticle()!.city" class="article-info">
+            <div *ngIf="selectedArticle()!.producerName" class="info-row">
+              <ion-icon name="person-outline"></ion-icon>
+              <span>{{ selectedArticle()!.producerName }}</span>
+              <span *ngIf="selectedArticle()!.city" class="city">· {{ selectedArticle()!.city }}</span>
+            </div>
+            <div *ngIf="selectedArticle()!.city && !selectedArticle()!.producerName" class="info-row">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>{{ selectedArticle()!.city }}</span>
+            </div>
+          </div>
+          
+          <!-- Price Info -->
+          <div class="price-info">
+            <p class="price">{{ formatPrice(selectedArticle()!.pricePerUnit, selectedArticle()!.unitMeasure) }}</p>
+            <p *ngIf="selectedArticle()!.taxRate" class="tax-rate">IVA {{ selectedArticle()!.taxRate }}%</p>
+          </div>
           
           <div class="quantity-controls">
             <ion-button (click)="decreaseQuantity()" fill="outline">
@@ -242,7 +276,20 @@
             </ion-button>
           </div>
           
-          <p class="total-price">{{ formatTotalPrice() }}</p>
+          <div class="price-breakdown">
+            <div class="price-line">
+              <span class="price-label">{{ 'CART.SUBTOTAL_WITHOUT_TAX' | translate }}:</span>
+              <span class="price-value">{{ formatPrice(getTotalWithoutTax()) }}</span>
+            </div>
+            <div *ngIf="selectedArticle()!.taxRate && getTaxAmount() > 0" class="price-line">
+              <span class="price-label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ selectedArticle()!.taxRate }}%):</span>
+              <span class="price-value">{{ formatPrice(getTaxAmount()) }}</span>
+            </div>
+            <div class="price-line final">
+              <span class="price-label">{{ 'CART.TOTAL' | translate }}:</span>
+              <span class="price-value final">{{ formatPrice(getTotalWithTax()) }}</span>
+            </div>
+          </div>
           
           <ion-button expand="block" (click)="confirmAddToCart()" [disabled]="modalQuantity() <= 0">
             {{ 'SHOWCASE.ADD_TO_CART' | translate }}
