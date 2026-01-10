@@ -303,6 +303,22 @@ export class ProfilePage implements OnInit {
     return `${numPrice.toFixed(2).replace('.', ',')} €`;
   }
 
+  formatQuantity(quantity: number | string | undefined | null): string {
+    if (quantity === undefined || quantity === null) return '0';
+    
+    const numQuantity = typeof quantity === 'string' ? parseFloat(quantity) : quantity;
+    if (isNaN(numQuantity)) return '0';
+    
+    // Si és un número enter, retornar sense decimals
+    if (numQuantity % 1 === 0) {
+      return numQuantity.toString();
+    }
+    
+    // Si té decimals, eliminar zeros innecessaris i convertir punt a coma
+    const formatted = numQuantity.toString().replace(/\.?0+$/, '');
+    return formatted.replace('.', ',');
+  }
+
   getOrderStatusColor(status?: string): string {
     if (!status) return 'medium';
     switch (status) {
@@ -342,6 +358,12 @@ export class ProfilePage implements OnInit {
       default:
         return 'warning';
     }
+  }
+
+  getTotalToPay(order: Order): number {
+    const total = order.totalPrice || order.totalAmount || 0;
+    const paid = order.paidAmount || 0;
+    return Math.max(0, total - paid);
   }
 
   async openOrderDetail(order: Order) {

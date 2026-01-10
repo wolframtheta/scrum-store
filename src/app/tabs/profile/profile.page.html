@@ -185,7 +185,10 @@
               </div>
               <div class="order-summary">
                 <span class="order-items">{{ order.items.length }} {{ 'PROFILE.ITEMS' | translate }}</span>
-                <span class="order-total">{{ formatPrice(order.totalPrice) }}</span>
+                <div class="order-price-info">
+                  <span class="order-total-label">{{ 'PROFILE.TOTAL_TO_PAY' | translate }}:</span>
+                  <span class="order-total">{{ formatPrice(getTotalToPay(order)) }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -290,7 +293,7 @@
                       <span class="label">{{ 'PROFILE.QUANTITY' | translate }}</span>
                     </div>
                     <span class="value-quantity">
-                      <span class="number">{{ item.quantity }}</span>
+                      <span class="number">{{ formatQuantity(item.quantity) }}</span>
                       <span class="unit">{{ item.article?.unitMeasure || 'ud' }}</span>
                     </span>
                   </div>
@@ -313,10 +316,10 @@
         <div class="footer-content">
           <div class="total-section">
             <div class="total-info">
-              <span class="total-label">{{ 'PROFILE.TOTAL' | translate }}</span>
+              <span class="total-label">{{ 'PROFILE.TOTAL_TO_PAY' | translate }}</span>
               <span class="items-count">{{ selectedOrder()!.items.length }} {{ 'PROFILE.ITEMS' | translate }}</span>
             </div>
-            <span class="total-price">{{ formatPrice(selectedOrder()?.totalPrice || 0) }}</span>
+            <span class="total-price">{{ formatPrice(getTotalToPay(selectedOrder()!)) }}</span>
           </div>
         </div>
       </ion-toolbar>

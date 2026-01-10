@@ -330,10 +330,23 @@ ion-accordion-group {
         color: #6B7280;
       }
 
-      .order-total {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: var(--ion-color-primary);
+      .order-price-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+
+        .order-total-label {
+          font-size: 0.75rem;
+          color: #6B7280;
+          font-weight: 500;
+        }
+
+        .order-total {
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: var(--ion-color-primary);
+        }
       }
     }
   }
@@ -341,10 +354,17 @@ ion-accordion-group {
 
 // Order Detail Modal
 .order-detail-modal {
+  --height: 100vh;
+  --max-height: 100vh;
+  --width: 100vw;
+  --max-width: 100vw;
+  
   .order-detail-content {
     --background: var(--ion-color-primary);
     --padding-top: 0;
     --padding-bottom: 0;
+    --max-height: 100vh;
+    overflow-y: auto;
   }
 
   .detail-container {
