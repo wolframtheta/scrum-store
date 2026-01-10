@@ -5,6 +5,7 @@ export interface ShowcaseArticleItem {
   variety?: string;
   category?: string;
   pricePerUnit: number;
+  taxRate?: number; // % d'IVA
   unitMeasure: string;
   image?: string;
   producerName?: string;

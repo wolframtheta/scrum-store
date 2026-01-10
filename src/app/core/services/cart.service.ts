@@ -5,8 +5,17 @@ import { Article } from '../models/article.model';
 export interface CartItem {
   article: Article;
   quantity: number; // Quantitat en la unitat de mesura de l'article
-  totalPrice: number;
+  totalPrice: number; // Preu total amb IVA
+  totalPriceWithoutTax: number; // Preu total sense IVA
+  taxAmount: number; // Quantitat d'IVA
   orderPeriodId?: string; // Nou: ID del període de pedido
+}
+
+export interface TaxSummary {
+  taxRate: number;
+  subtotalWithoutTax: number;
+  taxAmount: number;
+  subtotalWithTax: number;
 }
 
 @Injectable({
@@ -23,9 +32,44 @@ export class CartService {
   // Computed: total d'articles diferents
   public readonly itemsCount = computed(() => this._items().length);
 
-  // Computed: preu total de la cistella
+  // Computed: preu total de la cistella (amb IVA)
   public readonly totalPrice = computed(() => {
     return this._items().reduce((sum, item) => sum + item.totalPrice, 0);
+  });
+
+  // Computed: preu total sense IVA
+  public readonly totalPriceWithoutTax = computed(() => {
+    return this._items().reduce((sum, item) => sum + item.totalPriceWithoutTax, 0);
+  });
+
+  // Computed: total d'IVA
+  public readonly totalTaxAmount = computed(() => {
+    return this._items().reduce((sum, item) => sum + item.taxAmount, 0);
+  });
+
+  // Computed: resum agrupat per tipus d'IVA
+  public readonly taxSummary = computed(() => {
+    const summary = new Map<number, TaxSummary>();
+    
+    this._items().forEach(item => {
+      const taxRate = item.article.taxRate || 0;
+      const existing = summary.get(taxRate);
+      
+      if (existing) {
+        existing.subtotalWithoutTax += item.totalPriceWithoutTax;
+        existing.taxAmount += item.taxAmount;
+        existing.subtotalWithTax += item.totalPrice;
+      } else {
+        summary.set(taxRate, {
+          taxRate,
+          subtotalWithoutTax: item.totalPriceWithoutTax,
+          taxAmount: item.taxAmount,
+          subtotalWithTax: item.totalPrice
+        });
+      }
+    });
+    
+    return Array.from(summary.values()).sort((a, b) => a.taxRate - b.taxRate);
   });
 
   constructor(private storageService: StorageService) {
@@ -50,6 +94,25 @@ export class CartService {
   }
 
   /**
+   * Calcular preus amb IVA
+   */
+  private calculatePrices(pricePerUnit: number, quantity: number, taxRate: number = 0): {
+    totalPriceWithoutTax: number;
+    taxAmount: number;
+    totalPrice: number;
+  } {
+    const totalPriceWithoutTax = pricePerUnit * quantity;
+    const taxAmount = totalPriceWithoutTax * (taxRate / 100);
+    const totalPrice = totalPriceWithoutTax + taxAmount;
+    
+    return {
+      totalPriceWithoutTax: Math.round(totalPriceWithoutTax * 100) / 100,
+      taxAmount: Math.round(taxAmount * 100) / 100,
+      totalPrice: Math.round(totalPrice * 100) / 100
+    };
+  }
+
+  /**
    * Afegir o actualitzar article a la cistella
    */
   async addItem(article: Article, quantity: number): Promise<void> {
@@ -60,7 +123,8 @@ export class CartService {
       ? parseFloat(article.pricePerUnit)
       : article.pricePerUnit;
 
-    const totalPrice = pricePerUnit * quantity;
+    const taxRate = article.taxRate || 0;
+    const prices = this.calculatePrices(pricePerUnit, quantity, taxRate);
 
     // Extraer orderPeriodId si existe en el artículo
     const orderPeriodId = (article as any).orderPeriodId;
@@ -70,7 +134,9 @@ export class CartService {
       items[existingIndex] = {
         article,
         quantity,
-        totalPrice,
+        totalPrice: prices.totalPrice,
+        totalPriceWithoutTax: prices.totalPriceWithoutTax,
+        taxAmount: prices.taxAmount,
         orderPeriodId
       };
     } else {
@@ -78,7 +144,9 @@ export class CartService {
       items.push({
         article,
         quantity,
-        totalPrice,
+        totalPrice: prices.totalPrice,
+        totalPriceWithoutTax: prices.totalPriceWithoutTax,
+        taxAmount: prices.taxAmount,
         orderPeriodId
       });
     }
@@ -124,10 +192,15 @@ export class CartService {
         ? parseFloat(article.pricePerUnit)
         : article.pricePerUnit;
 
+      const taxRate = article.taxRate || 0;
+      const prices = this.calculatePrices(pricePerUnit, quantity, taxRate);
+
       items[index] = {
         article,
         quantity,
-        totalPrice: pricePerUnit * quantity,
+        totalPrice: prices.totalPrice,
+        totalPriceWithoutTax: prices.totalPriceWithoutTax,
+        taxAmount: prices.taxAmount,
         orderPeriodId: items[index].orderPeriodId // Mantener el periodId
       };
       this._items.set(items);

@@ -17,6 +17,7 @@ export interface Article {
   image?: string;
   unitMeasure: UnitMeasure;
   pricePerUnit: number;
+  taxRate?: number; // % d'IVA
   city?: string;
   producerId?: string;
   producerName?: string;
