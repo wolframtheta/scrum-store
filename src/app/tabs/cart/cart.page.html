@@ -54,6 +54,7 @@
               <!-- Price per unit -->
               <div class="item-price-per-unit">
                 <span>{{ formatPrice(item.article.pricePerUnit) }}/{{ item.article.unitMeasure }}</span>
+                <span *ngIf="item.article.taxRate" class="tax-rate">IVA {{ item.article.taxRate }}%</span>
               </div>
 
               <!-- Quantity controls -->
@@ -67,7 +68,7 @@
                 </ion-button>
 
                 <div class="quantity-display">
-                  <span class="quantity-value">{{ item.quantity }}</span>
+                  <span class="quantity-value">{{ formatQuantity(item.quantity) }}</span>
                   <span class="quantity-unit">{{ item.article.unitMeasure }}</span>
                 </div>
 
@@ -82,8 +83,20 @@
 
               <!-- Total price for this item -->
               <div class="item-total-price">
-                <span class="total-label">{{ 'CART.SUBTOTAL' | translate }}:</span>
-                <span class="total-value">{{ formatPrice(item.totalPrice) }}</span>
+                <div class="price-summary">
+                  <div class="price-line">
+                    <span class="total-label">{{ 'CART.SUBTOTAL_WITHOUT_TAX' | translate }}:</span>
+                    <span class="total-value">{{ formatPrice(item.totalPriceWithoutTax) }}</span>
+                  </div>
+                  <div *ngIf="item.article.taxRate && item.taxAmount > 0" class="price-line">
+                    <span class="total-label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ item.article.taxRate }}%):</span>
+                    <span class="total-value">{{ formatPrice(item.taxAmount) }}</span>
+                  </div>
+                  <div class="price-line final">
+                    <span class="total-label">{{ 'CART.SUBTOTAL' | translate }}:</span>
+                    <span class="total-value">{{ formatPrice(item.totalPrice) }}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -104,10 +117,46 @@
 <ion-footer *ngIf="items().length > 0" class="cart-footer">
   <ion-toolbar>
     <div class="footer-content">
-      <div class="total-section">
-        <span class="total-label">{{ 'CART.TOTAL' | translate }}:</span>
-        <span class="total-price">{{ formatPrice(totalPrice()) }}</span>
+      <!-- Tax breakdown by tax rate -->
+      <div *ngIf="taxSummary().length > 0" class="tax-breakdown-section">
+        <div class="tax-breakdown-title">{{ 'CART.TAX_BREAKDOWN' | translate }}</div>
+        <div *ngFor="let tax of taxSummary()" class="tax-group">
+          <div class="tax-group-header">
+            <span class="tax-rate-label">IVA {{ tax.taxRate }}%</span>
+          </div>
+          <div class="tax-group-details">
+            <div class="tax-detail-line">
+              <span class="tax-detail-label">{{ 'CART.SUBTOTAL_WITHOUT_TAX' | translate }}:</span>
+              <span class="tax-detail-value">{{ formatPrice(tax.subtotalWithoutTax) }}</span>
+            </div>
+            <div class="tax-detail-line">
+              <span class="tax-detail-label">{{ 'CART.TAX_AMOUNT' | translate }}:</span>
+              <span class="tax-detail-value">{{ formatPrice(tax.taxAmount) }}</span>
+            </div>
+            <div class="tax-detail-line total">
+              <span class="tax-detail-label">{{ 'CART.SUBTOTAL' | translate }}:</span>
+              <span class="tax-detail-value">{{ formatPrice(tax.subtotalWithTax) }}</span>
+            </div>
+          </div>
+        </div>
       </div>
+      
+      <!-- Total summary -->
+      <div class="total-section">
+        <div *ngIf="totalPriceWithoutTax() > 0" class="total-line">
+          <span class="total-label">{{ 'CART.SUBTOTAL_WITHOUT_TAX' | translate }}:</span>
+          <span class="total-value">{{ formatPrice(totalPriceWithoutTax()) }}</span>
+        </div>
+        <div *ngFor="let tax of taxSummary()" class="total-line">
+          <span class="total-label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ tax.taxRate }}%):</span>
+          <span class="total-value">{{ formatPrice(tax.taxAmount) }}</span>
+        </div>
+        <div class="total-line final">
+          <span class="total-label">{{ 'CART.TOTAL' | translate }}:</span>
+          <span class="total-price">{{ formatPrice(totalPrice()) }}</span>
+        </div>
+      </div>
+      
       <ion-button 
         expand="block" 
         color="secondary" 

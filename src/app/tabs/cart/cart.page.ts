@@ -54,6 +54,9 @@ import { OrdersService } from '../../core/services/orders.service';
 export class CartPage implements OnInit {
   items = this.cartService.items;
   totalPrice = this.cartService.totalPrice;
+  totalPriceWithoutTax = this.cartService.totalPriceWithoutTax;
+  totalTaxAmount = this.cartService.totalTaxAmount;
+  taxSummary = this.cartService.taxSummary;
 
   constructor(
     private cartService: CartService,
@@ -102,6 +105,20 @@ export class CartPage implements OnInit {
     const numPrice = typeof price === 'string' ? parseFloat(price) : price;
     if (isNaN(numPrice)) return '0,00 €';
     return `${numPrice.toFixed(2).replace('.', ',')} €`;
+  }
+
+  formatQuantity(quantity: number | string): string {
+    const numQuantity = typeof quantity === 'string' ? parseFloat(quantity) : quantity;
+    if (isNaN(numQuantity)) return '0';
+    
+    // Si és un número enter, retornar sense decimals
+    if (numQuantity % 1 === 0) {
+      return numQuantity.toString();
+    }
+    
+    // Si té decimals, eliminar zeros innecessaris i convertir punt a coma
+    const formatted = numQuantity.toString().replace(/\.?0+$/, '');
+    return formatted.replace('.', ',');
   }
 
   async confirmOrder() {

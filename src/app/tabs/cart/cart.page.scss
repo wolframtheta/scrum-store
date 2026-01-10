@@ -200,6 +200,15 @@ ion-header {
     font-size: 0.875rem;
     color: var(--ion-color-medium);
     font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .tax-rate {
+      font-size: 0.75rem;
+      color: var(--ion-color-primary);
+      font-weight: 500;
+    }
   }
 
   .quantity-controls {
@@ -247,22 +256,50 @@ ion-header {
   }
 
   .item-total-price {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     padding-top: 0.5rem;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
 
-    .total-label {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--ion-color-medium);
-    }
+    .price-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
 
-    .total-value {
-      font-size: 1.125rem;
-      font-weight: 700;
-      color: var(--ion-color-dark);
+      .price-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.875rem;
+
+        &.final {
+          margin-top: 0.25rem;
+          padding-top: 0.5rem;
+          border-top: 1px solid rgba(0, 0, 0, 0.08);
+          font-weight: 700;
+        }
+
+        .total-label {
+          font-weight: 500;
+          color: var(--ion-color-medium);
+        }
+
+        .total-value {
+          font-weight: 600;
+          color: var(--ion-color-dark);
+        }
+      }
+
+      .price-line.final {
+        .total-label {
+          font-weight: 700;
+          color: var(--ion-color-dark);
+        }
+
+        .total-value {
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: var(--ion-color-primary);
+        }
+      }
     }
   }
 }
@@ -301,20 +338,109 @@ ion-item-options {
   .footer-content {
     padding: 1rem;
 
+    .tax-breakdown-section {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      .tax-breakdown-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.95);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .tax-group {
+        margin-bottom: 0.75rem;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .tax-group-header {
+          margin-bottom: 0.5rem;
+
+          .tax-rate-label {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            display: inline-block;
+          }
+        }
+
+        .tax-group-details {
+          padding-left: 0.5rem;
+          border-left: 2px solid rgba(255, 255, 255, 0.3);
+
+          .tax-detail-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.25rem 0;
+            font-size: 0.8rem;
+
+            &.total {
+              margin-top: 0.25rem;
+              padding-top: 0.5rem;
+              border-top: 1px solid rgba(255, 255, 255, 0.2);
+              font-weight: 600;
+            }
+
+            .tax-detail-label {
+              color: rgba(255, 255, 255, 0.85);
+              font-weight: 500;
+            }
+
+            .tax-detail-value {
+              color: rgba(255, 255, 255, 0.95);
+              font-weight: 600;
+            }
+          }
+        }
+      }
+    }
+
     .total-section {
       background: var(--ion-color-tertiary);
       border-radius: 16px;
       padding: 1.25rem 1.5rem;
       margin-bottom: 1rem;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 0.5rem;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 
-      .total-label {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: rgba(255, 255, 255, 0.9);
+      .total-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        &.final {
+          padding-top: 0.5rem;
+          border-top: 2px solid rgba(255, 255, 255, 0.3);
+          margin-top: 0.25rem;
+        }
+
+        .total-label {
+          font-size: 1rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        .total-value {
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: rgba(255, 255, 255, 0.9);
+        }
       }
 
       .total-price {
