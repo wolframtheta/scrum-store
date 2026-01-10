@@ -40,17 +40,6 @@
         <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
         <span *ngIf="!isLoading">{{ 'LOGIN.LOGIN_BUTTON' | translate }}</span>
       </ion-button>
-
-      <div class="signup-section">
-        <p class="signup-text">{{ 'LOGIN.SIGNUP_TEXT' | translate }}</p>
-        <ion-button
-          expand="block"
-          fill="outline"
-          color="light"
-          class="signup-button">
-          {{ 'LOGIN.SIGNUP_BUTTON' | translate }}
-        </ion-button>
-      </div>
     </form>
   </div>
 </ion-content>
