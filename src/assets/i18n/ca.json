@@ -77,7 +77,7 @@
   "TABS": {
     "APARADOR": "Aparador",
     "CISTELLA": "Cistella",
-    "GRUP": "Grup",
+    "COMANDES": "Comandes",
     "PERFIL": "Perfil"
   },
   "PROFILE": {
@@ -116,7 +116,10 @@
     "ORDERS_TAB_UNPAID": "No pagades",
     "ORDERS_TAB_PARTIAL": "Parcials",
     "ORDERS_TAB_PAID": "Pagades",
-    "ARTICLE": "Article"
+    "ARTICLE": "Article",
+    "GROUP_NOTICES": "Avisos del grup",
+    "NO_NOTICES": "No hi ha avisos",
+    "NOTICE_DETAIL": "Detall de l'avís"
   },
   "RESET_PASSWORD": {
     "TITLE": "Restablir contrasenya",

@@ -17,7 +17,7 @@ ion-header {
 // =====================================
 // Content
 // =====================================
-.profile-content-page {
+.orders-content-page {
   --background: #F7FAFC;
 }
 
@@ -33,213 +33,37 @@ ion-header {
   }
 }
 
-.profile-container {
+.orders-container {
   padding: 16px;
   padding-bottom: 32px;
   min-height: 100%;
 }
 
-// Accordions
-ion-accordion-group {
+// Payment Status Tabs
+.payment-tabs {
   margin-bottom: 16px;
-}
-
-.profile-accordion {
-  margin-bottom: 12px;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-  background: white;
-
-  .accordion-header {
-    --background: white;
-    --color: var(--ion-color-dark);
-    --padding-start: 16px;
-    --padding-end: 16px;
-    font-weight: 600;
-
-    ion-icon {
-      font-size: 1.5rem;
-      color: var(--ion-color-primary);
-      margin-right: 12px;
-    }
-  }
-
-  .accordion-content {
-    background: white;
-  }
-}
-
-// User Card Styles
-.user-card {
-  margin-bottom: 16px;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-  ion-card-header {
-    background: white;
-  }
-
-  ion-card-content {
-    background: white;
-  }
-
-  .user-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 8px 0;
-
-    .user-avatar {
-      width: 80px;
-      height: 80px;
-      border: 3px solid var(--ion-color-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #E3F2FD;
-
-      .avatar-icon {
-        font-size: 48px;
-        color: var(--ion-color-primary);
-      }
-    }
-
-    .user-info {
-      flex: 1;
-
-      h2 {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #2C3E50;
-      }
-
-      .user-email {
-        margin: 4px 0 0;
-        color: #6B7280;
-        font-size: 0.9rem;
-      }
-    }
-  }
-
-  .user-details {
-    margin-top: 16px;
-    background: white;
-
-    ion-item {
-      --padding-start: 0;
-      --inner-padding-end: 0;
-      --background: white;
-      margin-bottom: 12px;
-
-      ion-icon {
-        color: var(--ion-color-primary);
-        font-size: 24px;
-        margin-right: 12px;
-      }
-
-      ion-label {
-        p {
-          color: #6B7280;
-          font-size: 0.85rem;
-          margin-bottom: 4px;
-        }
-
-        h3 {
-          color: #2C3E50;
-          font-size: 1rem;
-          font-weight: 500;
-          margin: 0;
-        }
-      }
-    }
-  }
-}
-
-// Group and Orders Sections (inside accordions)
-.group-selector {
-  margin-bottom: 20px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: white;
-
-  ion-item {
-    --padding-start: 12px;
-    --inner-padding-end: 12px;
-    --background: #F7FAFC;
-
-    ion-icon {
-      color: var(--ion-color-primary);
-      font-size: 24px;
-    }
-
-    ion-select {
-      color: #2C3E50;
-    }
-  }
-}
-
-.group-info {
   background: white;
   border-radius: 12px;
-  padding: 8px;
-  margin: 8px 0;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-  ion-list {
-    background: white;
-    border-radius: 12px;
-  }
-
-  ion-item {
-    --padding-start: 0;
-    --inner-padding-end: 0;
-    --background: white;
-    margin-bottom: 12px;
-
-    ion-icon {
-      color: var(--ion-color-primary);
-      font-size: 24px;
-      margin-right: 12px;
-    }
+  ion-segment-button {
+    --indicator-color: var(--ion-color-primary);
+    --color: var(--ion-color-medium);
+    --color-checked: var(--ion-color-primary);
+    font-weight: 600;
+    min-height: 44px;
 
     ion-label {
-      p {
-        color: #6B7280;
-        font-size: 0.85rem;
-        margin-bottom: 4px;
-
-        &:last-child {
-          margin-top: 4px;
-          font-size: 0.8rem;
-        }
-      }
-
-      h3 {
-        color: #2C3E50;
-        font-size: 1rem;
-        font-weight: 500;
-        margin: 0;
-      }
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     ion-badge {
-      font-size: 0.75rem;
-      padding: 6px 12px;
-      border-radius: 12px;
+      font-size: 0.7rem;
+      padding: 2px 6px;
     }
-  }
-}
-
-.no-groups {
-  text-align: center;
-  padding: 32px 16px;
-  color: #6B7280;
-  background: white;
-
-  p {
-    margin: 0;
-    font-size: 1rem;
   }
 }
 
@@ -296,69 +120,57 @@ ion-accordion-group {
         display: flex;
         flex-direction: column;
         gap: 4px;
-        flex: 1;
 
-        .notice-author {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-
-          .notice-avatar {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
-            background: var(--ion-color-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            ion-icon {
-              font-size: 1.5rem;
-              color: var(--ion-color-medium);
-            }
-          }
-
-          .author-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-
-            .author-name {
-              font-weight: 600;
-              font-size: 0.9rem;
-              color: #1F2937;
-            }
-
-            .order-date {
-              font-size: 0.75rem;
-              color: #6B7280;
-            }
-          }
+        .order-id {
+          font-weight: 700;
+          font-size: 0.9rem;
+          color: #1F2937;
         }
+
+        .order-date {
+          font-size: 0.75rem;
+          color: #6B7280;
+        }
+      }
+
+      .order-status {
+        font-size: 0.7rem;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
       }
     }
 
-    .notice-content-preview {
+    .order-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding-top: 12px;
       border-top: 1px solid #E5E7EB;
 
-      .notice-text {
-        font-size: 0.9rem;
-        color: #374151;
-        line-height: 1.5;
-        margin: 0 0 8px 0;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+      .order-items {
+        font-size: 0.875rem;
+        color: #6B7280;
       }
 
-      .notice-image-preview {
-        width: 100%;
-        max-height: 150px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-top: 8px;
+      .order-price-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+
+        .order-total-label {
+          font-size: 0.75rem;
+          color: #6B7280;
+          font-weight: 500;
+        }
+
+        .order-total {
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: var(--ion-color-primary);
+        }
       }
     }
   }
@@ -397,45 +209,6 @@ ion-accordion-group {
       align-items: flex-start;
       gap: 1rem;
 
-      .notice-author-header {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex: 1;
-
-        .notice-avatar-large {
-          width: 60px;
-          height: 60px;
-          min-width: 60px;
-          background: var(--ion-color-light);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          ion-icon {
-            font-size: 2rem;
-            color: var(--ion-color-medium);
-          }
-        }
-
-        .author-details {
-          flex: 1;
-
-          h2 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--ion-color-dark);
-            margin: 0 0 0.5rem 0;
-          }
-
-          .order-date-detail {
-            font-size: 0.875rem;
-            color: var(--ion-color-medium);
-            margin: 0;
-          }
-        }
-      }
-
       h2 {
         font-size: 1.25rem;
         font-weight: 700;
@@ -456,30 +229,6 @@ ion-accordion-group {
         font-weight: 600;
         text-transform: uppercase;
       }
-    }
-  }
-
-  .notice-content-full {
-    background: white;
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-
-    .notice-text-full {
-      font-size: 1rem;
-      color: #374151;
-      line-height: 1.6;
-      margin: 0 0 1rem 0;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-
-    .notice-image-full {
-      width: 100%;
-      max-height: 400px;
-      object-fit: contain;
-      border-radius: 12px;
-      margin-top: 1rem;
     }
   }
 
@@ -753,42 +502,11 @@ ion-accordion-group {
   }
 }
 
-// Logout Section
-.logout-section {
-  margin-top: 24px;
-  padding: 0 8px;
-
-  ion-button {
-    --border-radius: 8px;
-    --box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    height: 48px;
-    font-weight: 600;
-
-    ion-icon {
-      font-size: 20px;
-    }
-  }
-}
-
-// Version Section
-.version-section {
-  margin-top: 16px;
-  padding: 0 8px;
-  text-align: center;
-
-  .version-text {
-    font-size: 0.75rem;
-    color: #94a3b8;
-    font-weight: 400;
-    font-family: 'Courier New', monospace;
-    margin: 0;
-  }
-}
-
 // Responsive adjustments
 @media (min-width: 768px) {
-  .profile-container {
+  .orders-container {
     max-width: 600px;
     margin: 0 auto;
   }
 }
+

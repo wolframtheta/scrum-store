@@ -27,8 +27,8 @@ export const routes: Routes = [
         loadComponent: () => import('./tabs/cart/cart.page').then((m) => m.CartPage)
       },
       {
-        path: 'group',
-        loadComponent: () => import('./tabs/group/group.page').then((m) => m.GroupPage)
+        path: 'orders',
+        loadComponent: () => import('./tabs/orders/orders.page').then((m) => m.OrdersPage)
       },
       {
         path: 'profile',

@@ -62,7 +62,7 @@
     </ion-card>
 
     <!-- Accordions -->
-    <ion-accordion-group [multiple]="true" [value]="['consumer-group', 'orders']">
+    <ion-accordion-group [multiple]="true" [value]="['consumer-group', 'notices']">
 
       <!-- Consumer Group Accordion -->
       <ion-accordion value="consumer-group" class="profile-accordion">
@@ -131,64 +131,43 @@
         </div>
       </ion-accordion>
 
-      <!-- Orders Accordion -->
-      <ion-accordion value="orders" class="profile-accordion">
+      <!-- Notices Accordion -->
+      <ion-accordion value="notices" class="profile-accordion">
         <ion-item slot="header" class="accordion-header">
-          <ion-icon name="receipt-outline" slot="start"></ion-icon>
-          <ion-label>{{ 'PROFILE.MY_ORDERS' | translate }}</ion-label>
-          <ion-badge *ngIf="userOrders().length > 0" color="primary" slot="end">
-            {{ userOrders().length }}
+          <ion-icon name="notifications-outline" slot="start"></ion-icon>
+          <ion-label>{{ 'PROFILE.GROUP_NOTICES' | translate }}</ion-label>
+          <ion-badge *ngIf="groupNotices().length > 0" color="primary" slot="end">
+            {{ groupNotices().length }}
           </ion-badge>
         </ion-item>
 
         <div slot="content" class="accordion-content">
-          <!-- Payment Status Tabs -->
-          <ion-segment [(ngModel)]="selectedPaymentTab" class="payment-tabs">
-            <ion-segment-button value="all">
-              <ion-label>{{ 'PROFILE.ORDERS_TAB_ALL' | translate }}</ion-label>
-            </ion-segment-button>
-            <ion-segment-button value="unpaid">
-              <ion-label>
-                {{ 'PROFILE.ORDERS_TAB_UNPAID' | translate }}
-                <ion-badge *ngIf="unpaidCount() > 0">{{ unpaidCount() }}</ion-badge>
-              </ion-label>
-            </ion-segment-button>
-            <ion-segment-button value="partial">
-              <ion-label>
-                {{ 'PROFILE.ORDERS_TAB_PARTIAL' | translate }}
-                <ion-badge *ngIf="partialCount() > 0">{{ partialCount() }}</ion-badge>
-              </ion-label>
-            </ion-segment-button>
-            <ion-segment-button value="paid">
-              <ion-label>
-                {{ 'PROFILE.ORDERS_TAB_PAID' | translate }}
-                <ion-badge *ngIf="paidCount() > 0">{{ paidCount() }}</ion-badge>
-              </ion-label>
-            </ion-segment-button>
-          </ion-segment>
-
-          <div *ngIf="userOrders().length === 0" class="no-orders">
-            <ion-icon name="cart-outline" class="no-orders-icon"></ion-icon>
-            <p>{{ 'PROFILE.NO_ORDERS' | translate }}</p>
+          <div *ngIf="groupNotices().length === 0" class="no-orders">
+            <ion-icon name="notifications-outline" class="no-orders-icon"></ion-icon>
+            <p>{{ 'PROFILE.NO_NOTICES' | translate }}</p>
           </div>
 
-          <div *ngIf="userOrders().length > 0" class="orders-list">
-            <div *ngFor="let order of userOrders()" class="order-item" (click)="openOrderDetail(order)">
+          <div *ngIf="groupNotices().length > 0" class="orders-list">
+            <div *ngFor="let notice of groupNotices()" class="order-item" (click)="openNoticeDetail(notice)">
               <div class="order-header">
                 <div class="order-info">
-                  <span class="order-id">{{ 'PROFILE.ORDER' | translate }} #{{ order.id.slice(-8) }}</span>
-                  <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+                  <div class="notice-author">
+                    <ion-avatar *ngIf="notice.author.profileImageUrl" class="notice-avatar">
+                      <img [src]="notice.author.profileImageUrl" [alt]="notice.author.firstName">
+                    </ion-avatar>
+                    <ion-avatar *ngIf="!notice.author.profileImageUrl" class="notice-avatar">
+                      <ion-icon name="person-outline"></ion-icon>
+                    </ion-avatar>
+                    <div class="author-info">
+                      <span class="author-name">{{ notice.author.firstName }} {{ notice.author.lastName }}</span>
+                      <span class="order-date">{{ formatDate(notice.createdAt) }}</span>
+                    </div>
+                  </div>
                 </div>
-                <ion-badge [color]="getPaymentStatusColor(order)" class="order-status">
-                  {{ getPaymentStatusLabel(order) | translate }}
-                </ion-badge>
               </div>
-              <div class="order-summary">
-                <span class="order-items">{{ order.items.length }} {{ 'PROFILE.ITEMS' | translate }}</span>
-                <div class="order-price-info">
-                  <span class="order-total-label">{{ 'PROFILE.TOTAL_TO_PAY' | translate }}:</span>
-                  <span class="order-total">{{ formatPrice(getTotalToPay(order)) }}</span>
-                </div>
+              <div class="notice-content-preview">
+                <p class="notice-text">{{ notice.content }}</p>
+                <img *ngIf="notice.imageUrl" [src]="notice.imageUrl" class="notice-image-preview" [alt]="'Notice image'">
               </div>
             </div>
           </div>
@@ -216,17 +195,17 @@
     </div>
   </div>
 
-  <!-- Order Detail Modal -->
+  <!-- Notice Detail Modal -->
   <ion-modal
-    [isOpen]="isOrderDetailOpen()"
-    (didDismiss)="closeOrderDetail()"
+    [isOpen]="isNoticeDetailOpen()"
+    (didDismiss)="closeNoticeDetail()"
     class="order-detail-modal">
     <ng-template>
       <ion-header>
         <ion-toolbar color="primary">
-          <ion-title>{{ 'PROFILE.ORDER_DETAIL' | translate }}</ion-title>
+          <ion-title>{{ 'PROFILE.NOTICE_DETAIL' | translate }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeOrderDetail()">
+            <ion-button (click)="closeNoticeDetail()">
               <ion-icon slot="icon-only" name="close-outline"></ion-icon>
             </ion-button>
           </ion-buttons>
@@ -234,100 +213,34 @@
       </ion-header>
 
       <ion-content class="order-detail-content">
-        <div *ngIf="selectedOrder()" class="detail-container">
-          <!-- Order Info -->
+        <div *ngIf="selectedNotice()" class="detail-container">
+          <!-- Notice Info -->
           <div class="order-info-card">
             <div class="info-header">
-              <div>
-                <h2>{{ 'PROFILE.ORDER' | translate }} #{{ selectedOrder()!.id.slice(-8) }}</h2>
-                <p class="order-date-detail">{{ formatDate(selectedOrder()!.createdAt) }}</p>
+              <div class="notice-author-header">
+                <ion-avatar *ngIf="selectedNotice()!.author.profileImageUrl" class="notice-avatar-large">
+                  <img [src]="selectedNotice()!.author.profileImageUrl" [alt]="selectedNotice()!.author.firstName">
+                </ion-avatar>
+                <ion-avatar *ngIf="!selectedNotice()!.author.profileImageUrl" class="notice-avatar-large">
+                  <ion-icon name="person-outline"></ion-icon>
+                </ion-avatar>
+                <div class="author-details">
+                  <h2>{{ selectedNotice()!.author.firstName }} {{ selectedNotice()!.author.lastName }}</h2>
+                  <p class="order-date-detail">{{ formatDate(selectedNotice()!.createdAt) }}</p>
+                </div>
               </div>
-              <ion-badge [color]="getPaymentStatusColor(selectedOrder()!)" class="status-badge-large">
-                {{ getPaymentStatusLabel(selectedOrder()!) | translate }}
-              </ion-badge>
             </div>
           </div>
 
-          <!-- Order Items -->
+          <!-- Notice Content -->
           <div class="items-section">
-            <h3 class="section-title">{{ 'PROFILE.ORDER_ITEMS' | translate }} ({{ selectedOrder()!.items.length }})</h3>
-
-            <ion-card *ngFor="let item of selectedOrder()!.items" class="item-card">
-              <div class="item-detail">
-                <!-- Item Header -->
-                <div class="item-main">
-                  <div class="item-image" *ngIf="item.article?.image">
-                    <img [src]="item.article.image" [alt]="item.article.product || item.article.name">
-                  </div>
-                  <div class="item-image placeholder" *ngIf="!item.article?.image">
-                    <ion-icon name="cart-outline"></ion-icon>
-                  </div>
-
-                  <div class="item-info">
-                    <div class="item-title">
-                      <span class="item-category">{{ item.article?.category || '' }}</span>
-                      <h4>{{ item.article?.product || ('PROFILE.ARTICLE' | translate) }}</h4>
-                      <p *ngIf="item.article?.variety" class="item-variety">{{ item.article.variety }}</p>
-                    </div>
-                    <ion-badge *ngIf="item.article?.isSeasonal" color="success" class="seasonal-badge-small">
-                      <ion-icon name="leaf-outline"></ion-icon>
-                    </ion-badge>
-                  </div>
-                </div>
-
-                <!-- Producer info if available -->
-                <div class="producer-info" *ngIf="item.article?.producerName">
-                  <ion-icon name="person-outline"></ion-icon>
-                  <span>{{ item.article.producerName }}</span>
-                  <span *ngIf="item.article?.city" class="city">· {{ item.article.city }}</span>
-                </div>
-
-                <!-- Item Details -->
-                <div class="item-pricing">
-                  <div class="pricing-row price-unit">
-                    <div class="label-group">
-                      <ion-icon name="pricetag-outline"></ion-icon>
-                      <span class="label">{{ 'PROFILE.PRICE_PER_UNIT' | translate }}</span>
-                    </div>
-                    <span class="value">{{ formatPrice(item.pricePerUnit) }}/{{ item.article?.unitMeasure || 'ud' }}</span>
-                  </div>
-
-                  <div class="pricing-row quantity">
-                    <div class="label-group">
-                      <ion-icon name="cube-outline"></ion-icon>
-                      <span class="label">{{ 'PROFILE.QUANTITY' | translate }}</span>
-                    </div>
-                    <span class="value-quantity">
-                      <span class="number">{{ formatQuantity(item.quantity) }}</span>
-                      <span class="unit">{{ item.article?.unitMeasure || 'ud' }}</span>
-                    </span>
-                  </div>
-
-                  <div class="pricing-row subtotal">
-                    <div class="label-group">
-                      <ion-icon name="calculator-outline"></ion-icon>
-                      <span class="label">{{ 'PROFILE.SUBTOTAL' | translate }}</span>
-                    </div>
-                    <span class="value-total">{{ formatPrice(item.totalPrice) }}</span>
-                  </div>
-                </div>
-              </div>
-            </ion-card>
+            <div class="notice-content-full">
+              <p class="notice-text-full">{{ selectedNotice()!.content }}</p>
+              <img *ngIf="selectedNotice()!.imageUrl" [src]="selectedNotice()!.imageUrl" class="notice-image-full" [alt]="'Notice image'">
+            </div>
           </div>
         </div>
       </ion-content>
-
-      <ion-toolbar class="modal-footer">
-        <div class="footer-content">
-          <div class="total-section">
-            <div class="total-info">
-              <span class="total-label">{{ 'PROFILE.TOTAL_TO_PAY' | translate }}</span>
-              <span class="items-count">{{ selectedOrder()!.items.length }} {{ 'PROFILE.ITEMS' | translate }}</span>
-            </div>
-            <span class="total-price">{{ formatPrice(getTotalToPay(selectedOrder()!)) }}</span>
-          </div>
-        </div>
-      </ion-toolbar>
     </ng-template>
   </ion-modal>
 </ion-content>

@@ -12,7 +12,7 @@ import { addIcons } from 'ionicons';
 import { 
   storefrontOutline, 
   cartOutline, 
-  peopleOutline, 
+  receiptOutline, 
   personOutline 
 } from 'ionicons/icons';
 import { TranslateModule } from '@ngx-translate/core';
@@ -42,7 +42,7 @@ export class TabsPage implements OnInit {
     addIcons({
       storefrontOutline,
       cartOutline,
-      peopleOutline,
+      receiptOutline,
       personOutline
     });
   }

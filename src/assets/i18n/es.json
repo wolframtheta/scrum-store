@@ -76,7 +76,7 @@
   "TABS": {
     "APARADOR": "Escaparate",
     "CISTELLA": "Cesta",
-    "GRUP": "Grupo",
+    "COMANDES": "Comandas",
     "PERFIL": "Perfil"
   },
   "PROFILE": {
@@ -115,7 +115,10 @@
     "ORDERS_TAB_UNPAID": "No pagados",
     "ORDERS_TAB_PARTIAL": "Parciales",
     "ORDERS_TAB_PAID": "Pagados",
-    "ARTICLE": "Artículo"
+    "ARTICLE": "Artículo",
+    "GROUP_NOTICES": "Avisos del grupo",
+    "NO_NOTICES": "No hay avisos",
+    "NOTICE_DETAIL": "Detalle del aviso"
   },
   "RESET_PASSWORD": {
     "TITLE": "Restablecer contraseña",
