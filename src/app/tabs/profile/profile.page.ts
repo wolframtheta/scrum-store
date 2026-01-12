@@ -51,6 +51,7 @@ import {
 import { AuthService } from '../../core/services/auth.service';
 import { ConsumerGroupService } from '../../core/services/consumer-group.service';
 import { OrdersService } from '../../core/services/orders.service';
+import { VersionService } from '../../core/services/version.service';
 import { User } from '../../core/models/auth.model';
 import { ConsumerGroup } from '../../core/models/article.model';
 import { Order, PaymentStatus } from '../../core/models/order.model';
@@ -139,6 +140,7 @@ export class ProfilePage implements OnInit {
     private authService: AuthService,
     private consumerGroupService: ConsumerGroupService,
     private ordersService: OrdersService,
+    private versionService: VersionService,
     private router: Router,
     private alertController: AlertController,
     private toastController: ToastController,
@@ -166,6 +168,7 @@ export class ProfilePage implements OnInit {
   ngOnInit() {
     this.loadUserData();
     this.loadConsumerGroups();
+    this.versionService.loadVersion();
   }
 
   async loadOrders() {
@@ -397,5 +400,9 @@ export class ProfilePage implements OnInit {
       color
     });
     await toast.present();
+  }
+
+  getVersion(): string {
+    return this.versionService.getVersion();
   }
 }

@@ -695,6 +695,21 @@ ion-accordion-group {
   }
 }
 
+// Version Section
+.version-section {
+  margin-top: 16px;
+  padding: 0 8px;
+  text-align: center;
+
+  .version-text {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 400;
+    font-family: 'Courier New', monospace;
+    margin: 0;
+  }
+}
+
 // Responsive adjustments
 @media (min-width: 768px) {
   .profile-container {
