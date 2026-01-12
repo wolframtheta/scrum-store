@@ -3,16 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 export interface VersionInfo {
-  app?: {
-    version: string;
-    buildTag: string;
-    timestamp: string;
-  };
-  backoffice?: {
-    version: string;
-    buildTag: string;
-    timestamp: string;
-  };
+  version: string;
+  buildTag: string;
+  timestamp: string;
 }
 
 @Injectable({
@@ -39,11 +32,9 @@ export class VersionService {
       console.warn('No se pudo cargar version.json:', error);
       // Fallback a versión por defecto
       this.versionInfo.set({
-        app: {
-          version: '0.0.1',
-          buildTag: 'unknown',
-          timestamp: ''
-        }
+        version: '0.0.1',
+        buildTag: 'unknown',
+        timestamp: ''
       });
     } finally {
       this.isLoading.set(false);
@@ -52,12 +43,12 @@ export class VersionService {
 
   getVersion(): string {
     const info = this.versionInfo();
-    return info?.app?.version || '0.0.1';
+    return info?.version || '0.0.1';
   }
 
   getBuildTag(): string {
     const info = this.versionInfo();
-    return info?.app?.buildTag || 'unknown';
+    return info?.buildTag || 'unknown';
   }
 
   getVersionInfo() {
