@@ -18,8 +18,46 @@ if [ -z "$CURRENT_BRANCH" ]; then
   exit 1
 fi
 
-# Leer versión del package.json
-VERSION=$(node -p "require('./package.json').version")
+# Leer versión actual del package.json
+CURRENT_VERSION=$(node -p "require('./package.json').version")
+echo "📋 Current version: ${CURRENT_VERSION}"
+
+# Incrementar versión automáticamente (minor por defecto)
+# Acepta parámetro opcional: patch, minor, major
+VERSION_TYPE="${1:-minor}"
+
+# Función para incrementar versión
+increment_version() {
+  local version=$1
+  local type=$2
+  local major minor patch
+  
+  IFS='.' read -r major minor patch <<< "$version"
+  
+  case $type in
+    major)
+      major=$((major + 1))
+      minor=0
+      patch=0
+      ;;
+    minor)
+      minor=$((minor + 1))
+      patch=0
+      ;;
+    patch)
+      patch=$((patch + 1))
+      ;;
+    *)
+      echo "❌ Error: Tipo de versión inválido. Usa: patch, minor o major"
+      exit 1
+      ;;
+  esac
+  
+  echo "${major}.${minor}.${patch}"
+}
+
+# Incrementar versión
+VERSION=$(increment_version "$CURRENT_VERSION" "$VERSION_TYPE")
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 BUILD_TAG="${VERSION}-${TIMESTAMP}"
 
@@ -27,12 +65,23 @@ BUILD_TAG="${VERSION}-${TIMESTAMP}"
 MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1,2)
 GIT_TAG="${MAJOR_MINOR}"
 
+echo "🚀 Incrementing version: ${CURRENT_VERSION} → ${VERSION} (${VERSION_TYPE})"
 echo "📦 Building scrum-store app..."
-echo "📋 Version: ${VERSION}"
+echo "📋 New version: ${VERSION}"
 echo "🏷️  Build tag: ${BUILD_TAG}"
 echo "🏷️  Git tag: ${GIT_TAG}"
 echo "🌿 Current branch: ${CURRENT_BRANCH}"
 echo ""
+
+# Actualizar package.json con la nueva versión
+echo "📝 Updating package.json version..."
+node -e "
+const fs = require('fs');
+const pkg = require('./package.json');
+pkg.version = '${VERSION}';
+fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2) + '\n');
+"
+echo "✅ package.json updated to version ${VERSION}"
 
 # Usar version.json local del proyecto
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -46,6 +95,7 @@ cat > "$VERSION_FILE" <<EOF
   "timestamp": "${TIMESTAMP}"
 }
 EOF
+echo "✅ version.json updated"
 
 # Copiar version.json a assets antes del build
 if [ -f "$VERSION_FILE" ]; then
@@ -90,33 +140,43 @@ if [ -f "src/assets/version.json" ]; then
   echo "🧹 Cleaned up src/assets/version.json"
 fi
 
-# Commit y tag del version.json al final (solo si todo fue bien)
+# Commit, tag y push al final (solo si todo fue bien)
 echo ""
-echo "📝 Committing version.json..."
+echo "📝 Committing changes (package.json + version.json)..."
 cd "$SCRIPT_DIR"
 if [ -d ".git" ]; then
-  git add version.json
-  git commit -m "chore: update app version to ${GIT_TAG}" || {
-    echo "⚠️  Warning: No hay cambios para commitear en version.json"
+  # Añadir package.json y version.json al staging
+  git add package.json version.json
+  
+  # Commit con todos los cambios (usando major.minor)
+  git commit -m "chore: bump version to ${GIT_TAG} (${VERSION_TYPE})" || {
+    echo "⚠️  Warning: No hay cambios para commitear"
   }
 
   # Crear tag si no existe
   if git rev-parse "$GIT_TAG" >/dev/null 2>&1; then
-    echo "⚠️  Warning: El tag ${GIT_TAG} ya existe. Usando tag existente."
-  else
-    echo "🏷️  Creating git tag: ${GIT_TAG}"
-    git tag -a "${GIT_TAG}" -m "Release ${GIT_TAG} - ${TIMESTAMP}"
-    
-    # Hacer push del commit y tag al remoto
-    echo "⬆️  Pushing commit and tag to remote..."
-    git push origin HEAD || {
-      echo "⚠️  Warning: No se pudo hacer push del commit."
-    }
-    git push origin "${GIT_TAG}" || {
-      echo "⚠️  Warning: No se pudo hacer push del tag."
-    }
+    echo "⚠️  Warning: El tag ${GIT_TAG} ya existe. Eliminando tag local para recrearlo..."
+    git tag -d "${GIT_TAG}" 2>/dev/null || true
   fi
+  
+  echo "🏷️  Creating git tag: ${GIT_TAG}"
+  git tag -a "${GIT_TAG}" -m "Release ${GIT_TAG} - ${TIMESTAMP}"
+  
+  # Hacer push del commit y tag al remoto
+  echo "⬆️  Pushing commit and tag to remote..."
+  git push origin HEAD || {
+    echo "❌ Error: No se pudo hacer push del commit."
+    exit 1
+  }
+  git push origin "${GIT_TAG}" || {
+    echo "❌ Error: No se pudo hacer push del tag."
+    exit 1
+  }
+  echo "✅ Commit and tag pushed successfully!"
 else
   echo "⚠️  Warning: No se encontró repositorio git en el proyecto"
 fi
+
+echo ""
+echo "🎉 All done! Version ${VERSION} deployed successfully!"
 
