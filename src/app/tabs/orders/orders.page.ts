@@ -150,7 +150,7 @@ export class OrdersPage implements OnInit {
 
   formatPrice(price: number | string | undefined | null): string {
     // Handle null/undefined
-    if (price === undefined || price === null) {
+    if (price === undefined || price === null || price === '') {
       return '0,00 €';
     }
     
@@ -171,6 +171,7 @@ export class OrdersPage implements OnInit {
       return '0,00 €';
     }
     
+    // Format with 2 decimals
     return `${numPrice.toFixed(2).replace('.', ',')} €`;
   }
 
@@ -220,10 +221,70 @@ export class OrdersPage implements OnInit {
     }
   }
 
+  // Calcula el subtotal sense IVA d'una comanda
+  getOrderSubtotalWithoutTax(order: Order): number {
+    if (!order.items || order.items.length === 0) return 0;
+    return order.items.reduce((sum, item) => {
+      const totalPrice = typeof item.totalPrice === 'string' ? parseFloat(item.totalPrice) : (item.totalPrice || 0);
+      return sum + totalPrice;
+    }, 0);
+  }
+
+  // Calcula el desglossament d'IVA per taxa
+  getOrderTaxSummary(order: Order): { taxRate: number; taxAmount: number }[] {
+    if (!order.items || order.items.length === 0) return [];
+    
+    const taxMap = new Map<number, number>();
+    
+    order.items.forEach(item => {
+      const taxRate = typeof item.article?.taxRate === 'string' 
+        ? parseFloat(item.article.taxRate) 
+        : (item.article?.taxRate || 0);
+      const subtotal = typeof item.totalPrice === 'string' 
+        ? parseFloat(item.totalPrice) 
+        : (item.totalPrice || 0);
+      const taxAmount = subtotal * (taxRate / 100);
+      
+      if (taxMap.has(taxRate)) {
+        taxMap.set(taxRate, taxMap.get(taxRate)! + taxAmount);
+      } else {
+        taxMap.set(taxRate, taxAmount);
+      }
+    });
+    
+    return Array.from(taxMap.entries())
+      .map(([taxRate, taxAmount]) => ({ taxRate, taxAmount }))
+      .sort((a, b) => a.taxRate - b.taxRate);
+  }
+
+  // Calcula el total d'IVA de la comanda
+  getOrderTotalTax(order: Order): number {
+    return this.getOrderTaxSummary(order).reduce((sum, tax) => sum + tax.taxAmount, 0);
+  }
+
+  // Calcula el total amb IVA de la comanda
+  getOrderTotalWithTax(order: Order): number {
+    return this.getOrderSubtotalWithoutTax(order) + this.getOrderTotalTax(order);
+  }
+
   getTotalToPay(order: Order): number {
-    const total = order.totalPrice || order.totalAmount || 0;
-    const paid = order.paidAmount || 0;
-    return Math.max(0, total - paid);
+    const totalWithTax = this.getOrderTotalWithTax(order);
+    const paid = typeof order.paidAmount === 'string' ? parseFloat(order.paidAmount) : (order.paidAmount || 0);
+    return Math.max(0, totalWithTax - paid);
+  }
+
+  // Calcula el total amb IVA d'un article
+  getItemTotalWithTax(item: any): number {
+    const subtotal = typeof item.totalPrice === 'string' ? parseFloat(item.totalPrice) : (item.totalPrice || 0);
+    const taxRate = typeof item.article?.taxRate === 'string' ? parseFloat(item.article.taxRate) : (item.article?.taxRate || 0);
+    return subtotal * (1 + taxRate / 100);
+  }
+
+  // Comprova si una comanda té pagaments
+  hasPayments(order: Order | null): boolean {
+    if (!order) return false;
+    const paidAmount = typeof order.paidAmount === 'string' ? parseFloat(order.paidAmount) : (order.paidAmount || 0);
+    return paidAmount > 0;
   }
 
   async openOrderDetail(order: Order) {

@@ -64,8 +64,18 @@
         <div class="order-summary">
           <span class="order-items">{{ order.items.length }} {{ 'PROFILE.ITEMS' | translate }}</span>
           <div class="order-price-info">
-            <span class="order-total-label">{{ 'PROFILE.TOTAL_TO_PAY' | translate }}:</span>
-            <span class="order-total">{{ formatPrice(getTotalToPay(order)) }}</span>
+            <div class="price-row" *ngIf="hasPayments(order)">
+              <span class="order-total-label-small">{{ 'CART.TOTAL' | translate }}:</span>
+              <span class="order-total-small">{{ formatPrice(getOrderTotalWithTax(order)) }}</span>
+            </div>
+            <div class="price-row" *ngIf="hasPayments(order)">
+              <span class="order-total-label-small">{{ 'PROFILE.PAID' | translate }}:</span>
+              <span class="order-total-small paid">{{ formatPrice(order.paidAmount) }}</span>
+            </div>
+            <div class="price-row main">
+              <span class="order-total-label">{{ getTotalToPay(order) > 0 ? ('PROFILE.TOTAL_TO_PAY' | translate) : ('CART.TOTAL' | translate) }}:</span>
+              <span class="order-total">{{ formatPrice(getTotalToPay(order) > 0 ? getTotalToPay(order) : getOrderTotalWithTax(order)) }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -164,7 +174,21 @@
                       <ion-icon name="calculator-outline"></ion-icon>
                       <span class="label">{{ 'PROFILE.SUBTOTAL' | translate }}</span>
                     </div>
-                    <span class="value-total">{{ formatPrice(item.totalPrice) }}</span>
+                    <span class="value">{{ formatPrice(item.totalPrice) }}</span>
+                  </div>
+
+                  <div class="pricing-row tax" *ngIf="item.article?.taxRate">
+                    <div class="label-group">
+                      <span class="label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ item.article.taxRate }}%)</span>
+                    </div>
+                    <span class="value">{{ formatPrice((item.totalPrice || 0) * ((item.article?.taxRate || 0) / 100)) }}</span>
+                  </div>
+
+                  <div class="pricing-row total">
+                    <div class="label-group">
+                      <span class="label">{{ 'CART.TOTAL' | translate }}</span>
+                    </div>
+                    <span class="value-total">{{ formatPrice(getItemTotalWithTax(item)) }}</span>
                   </div>
                 </div>
               </div>
@@ -176,11 +200,33 @@
       <ion-toolbar class="modal-footer">
         <div class="footer-content">
           <div class="total-section">
-            <div class="total-info">
-              <span class="total-label">{{ 'PROFILE.TOTAL_TO_PAY' | translate }}</span>
-              <span class="items-count">{{ selectedOrder()!.items.length }} {{ 'PROFILE.ITEMS' | translate }}</span>
+            <div class="items-count-header">
+              <span>{{ selectedOrder()!.items.length }} {{ 'PROFILE.ITEMS' | translate }}</span>
             </div>
-            <span class="total-price">{{ formatPrice(getTotalToPay(selectedOrder()!)) }}</span>
+            
+            <!-- Desglossament de preus -->
+            <div class="total-breakdown">
+              <div class="total-line" *ngIf="getOrderSubtotalWithoutTax(selectedOrder()!) > 0">
+                <span class="total-label">{{ 'CART.SUBTOTAL_WITHOUT_TAX' | translate }}:</span>
+                <span class="total-value">{{ formatPrice(getOrderSubtotalWithoutTax(selectedOrder()!)) }}</span>
+              </div>
+              <div *ngFor="let tax of getOrderTaxSummary(selectedOrder()!)" class="total-line">
+                <span class="total-label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ tax.taxRate }}%):</span>
+                <span class="total-value">{{ formatPrice(tax.taxAmount) }}</span>
+              </div>
+              <div class="total-line final">
+                <span class="total-label">{{ 'CART.TOTAL' | translate }}:</span>
+                <span class="total-price">{{ formatPrice(getOrderTotalWithTax(selectedOrder()!)) }}</span>
+              </div>
+              <div class="total-line paid" *ngIf="hasPayments(selectedOrder())">
+                <span class="total-label">{{ 'PROFILE.PAID' | translate }}:</span>
+                <span class="total-value paid">{{ formatPrice(selectedOrder()!.paidAmount) }}</span>
+              </div>
+              <div class="total-line pending" *ngIf="getTotalToPay(selectedOrder()!) > 0">
+                <span class="total-label">{{ 'PROFILE.TOTAL_TO_PAY' | translate }}:</span>
+                <span class="total-price pending">{{ formatPrice(getTotalToPay(selectedOrder()!)) }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </ion-toolbar>
