@@ -120,29 +120,7 @@
 <ion-footer *ngIf="items().length > 0" class="cart-footer">
   <ion-toolbar>
     <div class="footer-content">
-      <!-- Tax breakdown by tax rate -->
-      <div *ngIf="taxSummary().length > 0" class="tax-breakdown-section">
-        <div class="tax-breakdown-title">{{ 'CART.TAX_BREAKDOWN' | translate }}</div>
-        <div *ngFor="let tax of taxSummary()" class="tax-group">
-          <div class="tax-group-header">
-            <span class="tax-rate-label">IVA {{ tax.taxRate }}%</span>
-          </div>
-          <div class="tax-group-details">
-            <div class="tax-detail-line">
-              <span class="tax-detail-label">{{ 'CART.SUBTOTAL_WITHOUT_TAX' | translate }}:</span>
-              <span class="tax-detail-value">{{ formatPrice(tax.subtotalWithoutTax) }}</span>
-            </div>
-            <div class="tax-detail-line">
-              <span class="tax-detail-label">{{ 'CART.TAX_AMOUNT' | translate }}:</span>
-              <span class="tax-detail-value">{{ formatPrice(tax.taxAmount) }}</span>
-            </div>
-            <div class="tax-detail-line total">
-              <span class="tax-detail-label">{{ 'CART.SUBTOTAL' | translate }}:</span>
-              <span class="tax-detail-value">{{ formatPrice(tax.subtotalWithTax) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      
       
       <!-- Total summary -->
       <div class="total-section">

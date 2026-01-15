@@ -101,7 +101,8 @@ export class CartPage implements OnInit {
     await this.showToast(this.translate.instant('CART.ITEM_REMOVED'), 'success');
   }
 
-  formatPrice(price: number | string): string {
+  formatPrice(price: number | string | undefined | null): string {
+    if (price === undefined || price === null || price === '') return '0,00 €';
     const numPrice = typeof price === 'string' ? parseFloat(price) : price;
     if (isNaN(numPrice)) return '0,00 €';
     return `${numPrice.toFixed(2).replace('.', ',')} €`;
