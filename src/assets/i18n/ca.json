@@ -46,7 +46,11 @@
     "CATEGORIES": "Categories",
     "PRODUCTS": "Productes",
     "VARIETIES": "Varietats",
-    "ADDED_TO_CART": "Article afegit a la cistella"
+    "ADDED_TO_CART": "Article afegit a la cistella",
+    "FILTERS_OPTIONS": {
+      "PRODUCER": "Productor",
+      "SUPPLIER": "Proveïdor"
+    }
   },
   "ADD_TO_CART_MODAL": {
     "TITLE": "Afegir a la cistella",

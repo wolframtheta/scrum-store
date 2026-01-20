@@ -45,7 +45,11 @@
     "CATEGORIES": "Categorías",
     "PRODUCTS": "Productos",
     "VARIETIES": "Variedades",
-    "ADDED_TO_CART": "Artículo añadido a la cesta"
+    "ADDED_TO_CART": "Artículo añadido a la cesta",
+    "FILTERS_OPTIONS": {
+      "PRODUCER": "Productor",
+      "SUPPLIER": "Proveedor"
+    }
   },
   "ADD_TO_CART_MODAL": {
     "TITLE": "Añadir a la cesta",

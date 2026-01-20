@@ -127,6 +127,34 @@
 
           </ion-accordion>
         </ion-accordion-group>
+
+        <!-- Productors filter -->
+        <div class="filter-section" *ngIf="uniqueProducers().length > 0">
+          <h3 class="filter-section-title">{{ 'SHOWCASE.FILTERS_OPTIONS.PRODUCER' | translate }}</h3>
+          <ion-item
+            *ngFor="let producer of uniqueProducers()"
+            (click)="toggleProducer(producer)">
+            <ion-checkbox
+              slot="start"
+              [checked]="isSelectedProducer(producer)">
+            </ion-checkbox>
+            <ion-label>{{ producer }}</ion-label>
+          </ion-item>
+        </div>
+
+        <!-- Proveïdors filter -->
+        <div class="filter-section" *ngIf="uniqueSuppliers().length > 0">
+          <h3 class="filter-section-title">{{ 'SHOWCASE.FILTERS_OPTIONS.SUPPLIER' | translate }}</h3>
+          <ion-item
+            *ngFor="let supplier of uniqueSuppliers()"
+            (click)="toggleSupplier(supplier)">
+            <ion-checkbox
+              slot="start"
+              [checked]="isSelectedSupplier(supplier)">
+            </ion-checkbox>
+            <ion-label>{{ supplier }}</ion-label>
+          </ion-item>
+        </div>
       </ion-content>
 
       <ion-toolbar class="modal-footer">

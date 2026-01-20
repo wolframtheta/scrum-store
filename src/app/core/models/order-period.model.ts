@@ -9,6 +9,7 @@ export interface ShowcaseArticleItem {
   unitMeasure: string;
   image?: string;
   producerName?: string;
+  supplierName?: string;
   isAvailable: boolean;
   isEco?: boolean;
   isSeasonal: boolean;

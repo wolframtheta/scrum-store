@@ -82,6 +82,8 @@ export class ShowcasePage implements OnInit {
   selectedCategories = signal<string[]>([]);
   selectedProducts = signal<string[]>([]);
   selectedVarieties = signal<string[]>([]);
+  selectedProducers = signal<string[]>([]);
+  selectedSuppliers = signal<string[]>([]);
   showEcoOnly = signal<boolean>(false);
 
   // Computed: obtenir tots els articles de tots els períodes
@@ -151,6 +153,30 @@ export class ShowcasePage implements OnInit {
     return hierarchy;
   });
 
+  // Computed: obtenir llista única de productors
+  uniqueProducers = computed(() => {
+    const articles = this.allArticles();
+    const producers = new Set<string>();
+    articles.forEach((article: ShowcaseArticleItem) => {
+      if (article.producerName) {
+        producers.add(article.producerName);
+      }
+    });
+    return Array.from(producers).sort();
+  });
+
+  // Computed: obtenir llista única de proveïdors (des dels articles)
+  uniqueSuppliers = computed(() => {
+    const articles = this.allArticles();
+    const suppliers = new Set<string>();
+    articles.forEach((article: ShowcaseArticleItem & { supplierName?: string }) => {
+      if (article.supplierName) {
+        suppliers.add(article.supplierName);
+      }
+    });
+    return Array.from(suppliers).sort();
+  });
+
   // Computed: filtrar períodes per cerca i filtres
   filteredPeriods = computed(() => {
     let periods = this.allPeriods();
@@ -158,6 +184,7 @@ export class ShowcasePage implements OnInit {
 
     if (!search && this.selectedCategories().length === 0 &&
         this.selectedProducts().length === 0 && this.selectedVarieties().length === 0 &&
+        this.selectedProducers().length === 0 && this.selectedSuppliers().length === 0 &&
         !this.showEcoOnly()) {
       return periods;
     }
@@ -192,6 +219,20 @@ export class ShowcasePage implements OnInit {
       const varieties = this.selectedVarieties();
       if (varieties.length > 0) {
         articles = articles.filter((article: ShowcaseArticleItem) => article.variety && varieties.includes(article.variety));
+      }
+
+      // Filtre per productors
+      const producers = this.selectedProducers();
+      if (producers.length > 0) {
+        articles = articles.filter((article: ShowcaseArticleItem) => article.producerName && producers.includes(article.producerName));
+      }
+
+      // Filtre per proveïdors
+      const suppliers = this.selectedSuppliers();
+      if (suppliers.length > 0) {
+        articles = articles.filter((article: ShowcaseArticleItem & { supplierName?: string }) => 
+          article.supplierName && suppliers.includes(article.supplierName)
+        );
       }
 
       // Filtre per ecològic
@@ -297,6 +338,24 @@ export class ShowcasePage implements OnInit {
     }
   }
 
+  toggleProducer(producer: string) {
+    const current = this.selectedProducers();
+    if (current.includes(producer)) {
+      this.selectedProducers.set(current.filter(p => p !== producer));
+    } else {
+      this.selectedProducers.set([...current, producer]);
+    }
+  }
+
+  toggleSupplier(supplier: string) {
+    const current = this.selectedSuppliers();
+    if (current.includes(supplier)) {
+      this.selectedSuppliers.set(current.filter(s => s !== supplier));
+    } else {
+      this.selectedSuppliers.set([...current, supplier]);
+    }
+  }
+
   isSelectedCategory(category: string): boolean {
     return this.selectedCategories().includes(category);
   }
@@ -307,6 +366,14 @@ export class ShowcasePage implements OnInit {
 
   isSelectedVariety(variety: string): boolean {
     return this.selectedVarieties().includes(variety);
+  }
+
+  isSelectedProducer(producer: string): boolean {
+    return this.selectedProducers().includes(producer);
+  }
+
+  isSelectedSupplier(supplier: string): boolean {
+    return this.selectedSuppliers().includes(supplier);
   }
 
   getCategoryAccordionValues(): string[] {
@@ -339,16 +406,20 @@ export class ShowcasePage implements OnInit {
     this.selectedCategories.set([]);
     this.selectedProducts.set([]);
     this.selectedVarieties.set([]);
+    this.selectedProducers.set([]);
+    this.selectedSuppliers.set([]);
     this.showEcoOnly.set(false);
     this.searchText.set('');
   }
 
   hasActiveFilters = computed(() => {
-    return this.selectedCategories().length > 0 || this.selectedProducts().length > 0 || this.selectedVarieties().length > 0 || this.showEcoOnly() || !!this.searchText();
+    return this.selectedCategories().length > 0 || this.selectedProducts().length > 0 || this.selectedVarieties().length > 0 || 
+           this.selectedProducers().length > 0 || this.selectedSuppliers().length > 0 || this.showEcoOnly() || !!this.searchText();
   });
 
   activeFiltersCount = computed(() => {
-    return this.selectedCategories().length + this.selectedProducts().length + this.selectedVarieties().length + (this.showEcoOnly() ? 1 : 0);
+    return this.selectedCategories().length + this.selectedProducts().length + this.selectedVarieties().length + 
+           this.selectedProducers().length + this.selectedSuppliers().length + (this.showEcoOnly() ? 1 : 0);
   });
 
   // Carreto

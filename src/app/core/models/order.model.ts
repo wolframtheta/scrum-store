@@ -14,6 +14,15 @@ export interface OrderItem {
   pricePerUnit: number;
   totalPrice: number;
   paidAmount?: number;
+  periodId?: string;
+  period?: {
+    id: string;
+    name: string;
+    supplierId: string;
+    startDate: Date | string;
+    endDate: Date | string;
+    deliveryDate: Date | string;
+  };
 }
 
 export interface Order {
