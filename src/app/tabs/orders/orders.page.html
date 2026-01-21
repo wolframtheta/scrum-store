@@ -177,9 +177,9 @@
                     <span class="value">{{ formatPrice(item.totalPrice) }}</span>
                   </div>
 
-                  <div class="pricing-row tax" *ngIf="item.article?.taxRate">
+                  <div class="pricing-row tax" *ngIf="item.article?.taxRate && (item.article?.taxRate ?? 0) > 0">
                     <div class="label-group">
-                      <span class="label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ item.article.taxRate }}%)</span>
+                      <span class="label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ item.article?.taxRate }}%)</span>
                     </div>
                     <span class="value">{{ formatPrice((item.totalPrice || 0) * ((item.article?.taxRate || 0) / 100)) }}</span>
                   </div>
@@ -210,10 +210,12 @@
                 <span class="total-label">{{ 'CART.SUBTOTAL_WITHOUT_TAX' | translate }}:</span>
                 <span class="total-value">{{ formatPrice(getOrderSubtotalWithoutTax(selectedOrder()!)) }}</span>
               </div>
-              <div *ngFor="let tax of getOrderTaxSummary(selectedOrder()!)" class="total-line">
-                <span class="total-label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ tax.taxRate }}%):</span>
-                <span class="total-value">{{ formatPrice(tax.taxAmount) }}</span>
-              </div>
+              <ng-container *ngFor="let tax of getOrderTaxSummary(selectedOrder()!)">
+                <div *ngIf="tax.taxAmount > 0" class="total-line">
+                  <span class="total-label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ tax.taxRate }}%):</span>
+                  <span class="total-value">{{ formatPrice(tax.taxAmount) }}</span>
+                </div>
+              </ng-container>
               <div class="total-line final">
                 <span class="total-label">{{ 'CART.TOTAL' | translate }}:</span>
                 <span class="total-price">{{ formatPrice(getOrderTotalWithTax(selectedOrder()!)) }}</span>

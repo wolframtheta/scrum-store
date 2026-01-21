@@ -220,7 +220,7 @@
         <div class="article-footer">
           <div class="price-section">
             <span class="price">{{ formatPrice(article.pricePerUnit, article.unitMeasure) }}</span>
-            <span *ngIf="article.taxRate" class="tax-rate">IVA {{ article.taxRate }}%</span>
+            <span *ngIf="article.taxRate && article.taxRate > 0" class="tax-rate">IVA {{ article.taxRate }}%</span>
           </div>
         </div>
       </ion-card-content>
@@ -286,7 +286,7 @@
           <!-- Price Info -->
           <div class="price-info">
             <p class="price">{{ formatPrice(selectedArticle()!.pricePerUnit, selectedArticle()!.unitMeasure) }}</p>
-            <p *ngIf="selectedArticle()!.taxRate" class="tax-rate">IVA {{ selectedArticle()!.taxRate }}%</p>
+            <p *ngIf="selectedArticle()?.taxRate && (selectedArticle()?.taxRate ?? 0) > 0" class="tax-rate">IVA {{ selectedArticle()!.taxRate }}%</p>
           </div>
           
           <div class="quantity-controls">

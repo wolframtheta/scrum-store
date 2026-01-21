@@ -69,7 +69,9 @@ export class CartService {
       }
     });
     
-    return Array.from(summary.values()).sort((a, b) => a.taxRate - b.taxRate);
+    return Array.from(summary.values())
+      .filter(tax => tax.taxRate > 0 && tax.taxAmount > 0)
+      .sort((a, b) => a.taxRate - b.taxRate);
   });
 
   constructor(private storageService: StorageService) {

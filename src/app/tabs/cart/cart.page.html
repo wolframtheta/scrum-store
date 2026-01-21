@@ -57,7 +57,7 @@
               <!-- Price per unit -->
               <div class="item-price-per-unit">
                 <span>{{ formatPrice(item.article.pricePerUnit) }}/{{ item.article.unitMeasure }}</span>
-                <span *ngIf="item.article.taxRate" class="tax-rate">IVA {{ item.article.taxRate }}%</span>
+                <span *ngIf="item.article.taxRate && item.article.taxRate > 0" class="tax-rate">IVA {{ item.article.taxRate }}%</span>
               </div>
 
               <!-- Quantity controls -->
@@ -128,10 +128,12 @@
           <span class="total-label">{{ 'CART.SUBTOTAL_WITHOUT_TAX' | translate }}:</span>
           <span class="total-value">{{ formatPrice(totalPriceWithoutTax()) }}</span>
         </div>
-        <div *ngFor="let tax of taxSummary()" class="total-line">
-          <span class="total-label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ tax.taxRate }}%):</span>
-          <span class="total-value">{{ formatPrice(tax.taxAmount) }}</span>
-        </div>
+        <ng-container *ngFor="let tax of taxSummary()">
+          <div *ngIf="tax.taxAmount > 0" class="total-line">
+            <span class="total-label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ tax.taxRate }}%):</span>
+            <span class="total-value">{{ formatPrice(tax.taxAmount) }}</span>
+          </div>
+        </ng-container>
         <div class="total-line final">
           <span class="total-label">{{ 'CART.TOTAL' | translate }}:</span>
           <span class="total-price">{{ formatPrice(totalPrice()) }}</span>

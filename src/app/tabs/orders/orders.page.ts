@@ -254,6 +254,7 @@ export class OrdersPage implements OnInit {
     
     return Array.from(taxMap.entries())
       .map(([taxRate, taxAmount]) => ({ taxRate, taxAmount }))
+      .filter(tax => tax.taxRate > 0 && tax.taxAmount > 0)
       .sort((a, b) => a.taxRate - b.taxRate);
   }
 
