@@ -26,6 +26,10 @@ import {
   IonAccordionGroup,
   IonAccordion,
   IonText,
+  IonInput,
+  IonSelect,
+  IonSelectOption,
+  IonToggle,
   ToastController,
   AlertController
 } from '@ionic/angular/standalone';
@@ -36,6 +40,7 @@ import { ShowcaseService } from '../../core/services/showcase.service';
 import { ConsumerGroupService } from '../../core/services/consumer-group.service';
 import { CartService } from '../../core/services/cart.service';
 import { ShowcasePeriod, ShowcaseArticleItem } from '../../core/models/order-period.model';
+import { SelectedOption } from '../../core/models/article.model';
 
 @Component({
   selector: 'app-showcase',
@@ -65,7 +70,11 @@ import { ShowcasePeriod, ShowcaseArticleItem } from '../../core/models/order-per
     IonItem,
     IonCheckbox,
     IonAccordionGroup,
-    IonAccordion
+    IonAccordion,
+    IonInput,
+    IonSelect,
+    IonSelectOption,
+    IonToggle
   ]
 })
 export class ShowcasePage implements OnInit {
@@ -77,6 +86,7 @@ export class ShowcasePage implements OnInit {
   selectedArticle = signal<ShowcaseArticleItem | null>(null);
   selectedPeriodId = signal<string | null>(null);
   modalQuantity = signal(0);
+  customizationValues = signal<Record<string, any>>({});
 
   // Filtres
   selectedCategories = signal<string[]>([]);
@@ -438,6 +448,7 @@ export class ShowcasePage implements OnInit {
     this.selectedArticle.set(null);
     this.selectedPeriodId.set(null);
     this.modalQuantity.set(0);
+    this.customizationValues.set({});
   }
 
   getQuantityStep(): number {
@@ -470,6 +481,20 @@ export class ShowcasePage implements OnInit {
     const quantity = this.modalQuantity();
 
     if (!article || !periodId || quantity <= 0) return;
+
+    // Validar opciones requeridas
+    const cartArticle = article as any;
+    if (cartArticle.customizationOptions) {
+      for (const option of cartArticle.customizationOptions) {
+        if (option.required && !this.customizationValues()[option.id]) {
+          await this.showToast(
+            this.translate.instant('SHOWCASE.REQUIRED_OPTION', { title: option.title }),
+            'warning'
+          );
+          return;
+        }
+      }
+    }
 
     const existingItem = this.cartService.getItem(article.articleId);
 
@@ -520,7 +545,55 @@ export class ShowcasePage implements OnInit {
         orderPeriodId: periodId
       } as any;
 
-      await this.cartService.addItem(cartArticle, quantity);
+      // Preparar opciones seleccionadas amb preus
+      const selectedOptions: SelectedOption[] = [];
+      const customizationOptions = (article as any).customizationOptions;
+      
+      if (customizationOptions && customizationOptions.length > 0) {
+        for (const option of customizationOptions) {
+          const value = this.customizationValues()[option.id];
+          if (value !== undefined && value !== null && value !== '') {
+            let optionPrice = 0;
+            
+            // Calcular preu segons el tipus d'opció
+            if (option.type === 'boolean' && value === true) {
+              // Per boolean, si està activat, afegir el preu de l'opció
+              optionPrice = option.price || 0;
+            } else if (option.type === 'select' && typeof value === 'string') {
+              // Per select, buscar el preu del valor seleccionat
+              const selectedValue = option.values?.find((v: any) => v.id === value);
+              optionPrice = selectedValue?.price || option.price || 0;
+            } else if (option.type === 'multiselect' && Array.isArray(value)) {
+              // Per multiselect, sumar els preus de tots els valors seleccionats
+              optionPrice = value.reduce((sum, valId) => {
+                const selectedValue = option.values?.find((v: any) => v.id === valId);
+                return sum + (selectedValue?.price || 0);
+              }, 0);
+              // Si no hi ha preus als valors, usar el preu de l'opció
+              if (optionPrice === 0 && option.price) {
+                optionPrice = option.price;
+              }
+            } else if (option.type === 'numeric' || option.type === 'string') {
+              // Per numeric/string, usar el preu de l'opció si existeix
+              optionPrice = option.price || 0;
+            }
+            
+            selectedOptions.push({
+              optionId: option.id,
+              title: option.title,
+              type: option.type,
+              value: value,
+              price: optionPrice
+            });
+          }
+        }
+      }
+
+      await this.cartService.addItem(
+        cartArticle, 
+        quantity, 
+        selectedOptions.length > 0 ? selectedOptions : undefined
+      );
       this.closeAddToCartModal();
       await this.showToast(this.translate.instant('SHOWCASE.ADDED_TO_CART'), 'success');
     } catch (error) {
@@ -550,6 +623,55 @@ export class ShowcasePage implements OnInit {
     return `${numPrice.toFixed(2).replace('.', ',')} €`;
   }
 
+  // Métodos para manejar opciones de personalización
+  hasCustomizationOptions(): boolean {
+    const article = this.selectedArticle();
+    return !!(article && (article as any).customizationOptions && (article as any).customizationOptions.length > 0);
+  }
+
+  getCustomizationOptions(): any[] {
+    const article = this.selectedArticle();
+    if (!article) return [];
+    return (article as any).customizationOptions || [];
+  }
+
+  onCustomizationChange(optionId: string, value: any) {
+    const current = this.customizationValues();
+    this.customizationValues.set({
+      ...current,
+      [optionId]: value
+    });
+  }
+
+  onCustomizationNumericChange(optionId: string, value: string | null | undefined) {
+    const numValue = value ? parseFloat(value) : null;
+    this.onCustomizationChange(optionId, numValue);
+  }
+
+  getCustomizationValue(optionId: string): any {
+    return this.customizationValues()[optionId];
+  }
+
+  getOptionPrice(option: any): number {
+    const value = this.getCustomizationValue(option.id);
+    if (value === undefined || value === null || value === '') return 0;
+    
+    if (option.type === 'boolean' && value === true) {
+      return option.price || 0;
+    } else if (option.type === 'select' && typeof value === 'string') {
+      const selectedValue = option.values?.find((v: any) => v.id === value);
+      return selectedValue?.price || option.price || 0;
+    } else if (option.type === 'multiselect' && Array.isArray(value)) {
+      return value.reduce((sum: number, valId: string) => {
+        const selectedValue = option.values?.find((v: any) => v.id === valId);
+        return sum + (selectedValue?.price || 0);
+      }, 0) || option.price || 0;
+    } else if (option.type === 'numeric' || option.type === 'string') {
+      return option.price || 0;
+    }
+    return 0;
+  }
+
   formatTotalPrice(): string {
     const article = this.selectedArticle();
     if (!article) return '0,00 €';
@@ -568,10 +690,45 @@ export class ShowcasePage implements OnInit {
     return `${totalWithTax.toFixed(2).replace('.', ',')} €`;
   }
 
+  getCustomizationOptionsTotalPrice(): number {
+    const article = this.selectedArticle();
+    if (!article) return 0;
+    
+    const customizationOptions = (article as any).customizationOptions;
+    if (!customizationOptions || customizationOptions.length === 0) return 0;
+    
+    let total = 0;
+    const values = this.customizationValues();
+    
+    for (const option of customizationOptions) {
+      const value = values[option.id];
+      if (value === undefined || value === null || value === '') continue;
+      
+      if (option.type === 'boolean' && value === true) {
+        total += option.price || 0;
+      } else if (option.type === 'select' && typeof value === 'string') {
+        const selectedValue = option.values?.find((v: any) => v.id === value);
+        total += selectedValue?.price || option.price || 0;
+      } else if (option.type === 'multiselect' && Array.isArray(value)) {
+        const multiselectTotal = value.reduce((sum, valId) => {
+          const selectedValue = option.values?.find((v: any) => v.id === valId);
+          return sum + (selectedValue?.price || 0);
+        }, 0);
+        total += multiselectTotal || option.price || 0;
+      } else if (option.type === 'numeric' || option.type === 'string') {
+        total += option.price || 0;
+      }
+    }
+    
+    return total;
+  }
+
   getTotalWithoutTax(): number {
     const article = this.selectedArticle();
     if (!article) return 0;
-    return article.pricePerUnit * this.modalQuantity();
+    const basePrice = article.pricePerUnit * this.modalQuantity();
+    const customizationPrice = this.getCustomizationOptionsTotalPrice() * this.modalQuantity();
+    return basePrice + customizationPrice;
   }
 
   getTaxAmount(): number {

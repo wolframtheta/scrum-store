@@ -50,7 +50,11 @@
     "FILTERS_OPTIONS": {
       "PRODUCER": "Productor",
       "SUPPLIER": "Proveïdor"
-    }
+    },
+    "CUSTOMIZATION_OPTIONS": "Opcions de personalització",
+    "ENTER_VALUE": "Introdueix un valor",
+    "SELECT_OPTION": "Selecciona una opció",
+    "REQUIRED_FIELDS": "Tots els camps obligatoris han de ser emplenats"
   },
   "ADD_TO_CART_MODAL": {
     "TITLE": "Afegir a la cistella",

@@ -303,6 +303,96 @@
               <ion-icon slot="icon-only" name="add-outline"></ion-icon>
             </ion-button>
           </div>
+
+          <!-- Customization Options -->
+          <div *ngIf="hasCustomizationOptions()" class="customization-options">
+            <h3>{{ 'SHOWCASE.CUSTOMIZATION_OPTIONS' | translate }}</h3>
+            
+            <div *ngFor="let option of getCustomizationOptions()" class="customization-option">
+              <!-- Boolean option -->
+              <ion-item *ngIf="option.type === 'boolean'" lines="none">
+                <ion-label>
+                  {{ option.title }}
+                  <span *ngIf="option.required" class="required">*</span>
+                  <span *ngIf="getCustomizationValue(option.id) && getOptionPrice(option) > 0" class="option-price">
+                    (+{{ formatPrice(getOptionPrice(option)) }})
+                  </span>
+                </ion-label>
+                <ion-toggle 
+                  mode="ios"
+                  [checked]="getCustomizationValue(option.id) || false"
+                  (ionChange)="onCustomizationChange(option.id, $event.detail.checked)">
+                </ion-toggle>
+              </ion-item>
+
+              <!-- Numeric option -->
+              <ion-item *ngIf="option.type === 'numeric'" lines="none">
+                <ion-label position="stacked">
+                  {{ option.title }}
+                  <span *ngIf="option.required" class="required">*</span>
+                </ion-label>
+                <ion-input 
+                  type="number"
+                  [value]="getCustomizationValue(option.id)"
+                  (ionInput)="onCustomizationNumericChange(option.id, $event.detail.value)"
+                  [placeholder]="'SHOWCASE.ENTER_VALUE' | translate">
+                </ion-input>
+              </ion-item>
+
+              <!-- String option -->
+              <ion-item *ngIf="option.type === 'string'" lines="none">
+                <ion-label position="stacked">
+                  {{ option.title }}
+                  <span *ngIf="option.required" class="required">*</span>
+                </ion-label>
+                <ion-input 
+                  type="text"
+                  [value]="getCustomizationValue(option.id)"
+                  (ionInput)="onCustomizationChange(option.id, $event.detail.value)"
+                  [placeholder]="'SHOWCASE.ENTER_VALUE' | translate">
+                </ion-input>
+              </ion-item>
+
+              <!-- Select option -->
+              <ion-item *ngIf="option.type === 'select'" lines="none">
+                <ion-label position="stacked">
+                  {{ option.title }}
+                  <span *ngIf="option.required" class="required">*</span>
+                  <span *ngIf="getCustomizationValue(option.id) && getOptionPrice(option) > 0" class="option-price">
+                    (+{{ formatPrice(getOptionPrice(option)) }})
+                  </span>
+                </ion-label>
+                <ion-select 
+                  [value]="getCustomizationValue(option.id)"
+                  (ionChange)="onCustomizationChange(option.id, $event.detail.value)"
+                  [placeholder]="'SHOWCASE.SELECT_OPTION' | translate">
+                  <ion-select-option *ngFor="let val of option.values" [value]="val.id">
+                    {{ val.label }}<span *ngIf="val.price && val.price > 0"> (+{{ formatPrice(val.price) }})</span>
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <!-- Multiselect option -->
+              <ion-item *ngIf="option.type === 'multiselect'" lines="none">
+                <ion-label position="stacked">
+                  {{ option.title }}
+                  <span *ngIf="option.required" class="required">*</span>
+                  <span *ngIf="getCustomizationValue(option.id) && getOptionPrice(option) > 0" class="option-price">
+                    (+{{ formatPrice(getOptionPrice(option)) }})
+                  </span>
+                </ion-label>
+                <ion-select 
+                  [value]="getCustomizationValue(option.id) || []"
+                  (ionChange)="onCustomizationChange(option.id, $event.detail.value)"
+                  [placeholder]="'SHOWCASE.SELECT_OPTIONS' | translate"
+                  [multiple]="true">
+                  <ion-select-option *ngFor="let val of option.values" [value]="val.id">
+                    {{ val.label }}<span *ngIf="val.price && val.price > 0"> (+{{ formatPrice(val.price) }})</span>
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+          </div>
           
           <div class="price-breakdown">
             <div class="price-line">

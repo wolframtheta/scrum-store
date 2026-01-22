@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { StorageService } from './storage.service';
-import { Article } from '../models/article.model';
+import { Article, SelectedOption } from '../models/article.model';
 
 export interface CartItem {
   article: Article;
@@ -9,6 +9,7 @@ export interface CartItem {
   totalPriceWithoutTax: number; // Preu total sense IVA
   taxAmount: number; // Quantitat d'IVA
   orderPeriodId?: string; // Nou: ID del període de pedido
+  selectedOptions?: SelectedOption[]; // Opciones personalizadas seleccionadas
 }
 
 export interface TaxSummary {
@@ -117,7 +118,7 @@ export class CartService {
   /**
    * Afegir o actualitzar article a la cistella
    */
-  async addItem(article: Article, quantity: number): Promise<void> {
+  async addItem(article: Article, quantity: number, selectedOptions?: SelectedOption[]): Promise<void> {
     const items = [...this._items()];
     const existingIndex = items.findIndex(item => item.article.id === article.id);
 
@@ -139,7 +140,8 @@ export class CartService {
         totalPrice: prices.totalPrice,
         totalPriceWithoutTax: prices.totalPriceWithoutTax,
         taxAmount: prices.taxAmount,
-        orderPeriodId
+        orderPeriodId,
+        selectedOptions
       };
     } else {
       // Afegir nou article
@@ -149,7 +151,8 @@ export class CartService {
         totalPrice: prices.totalPrice,
         totalPriceWithoutTax: prices.totalPriceWithoutTax,
         taxAmount: prices.taxAmount,
-        orderPeriodId
+        orderPeriodId,
+        selectedOptions
       });
     }
 
@@ -203,7 +206,8 @@ export class CartService {
         totalPrice: prices.totalPrice,
         totalPriceWithoutTax: prices.totalPriceWithoutTax,
         taxAmount: prices.taxAmount,
-        orderPeriodId: items[index].orderPeriodId // Mantener el periodId
+        orderPeriodId: items[index].orderPeriodId, // Mantener el periodId
+        selectedOptions: items[index].selectedOptions // Mantener las opciones seleccionadas
       };
       this._items.set(items);
       await this.saveCart();

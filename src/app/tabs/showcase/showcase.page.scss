@@ -535,6 +535,89 @@
       }
     }
 
+    .customization-options {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      margin: 0.5rem 0;
+
+      h3 {
+        color: var(--ion-color-dark);
+        font-size: 1.125rem;
+        font-weight: 700;
+        margin: 0 0 1rem 0;
+      }
+
+      .customization-option {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: rgba(var(--ion-color-light-rgb), 0.3);
+        border-radius: 12px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        ion-item {
+          --background: transparent;
+          --padding-start: 0;
+          --padding-end: 0;
+          --inner-padding-end: 0;
+          --border-width: 0;
+          --border-color: transparent;
+          margin-bottom: 0;
+          border-radius: 8px;
+          
+          &::part(native) {
+            flex: none;
+            width: auto;
+          }
+
+          ion-label {
+            color: var(--ion-color-dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+
+            .required {
+              color: var(--ion-color-danger);
+              margin-left: 0.25rem;
+            }
+
+            .option-price {
+              color: var(--ion-color-primary);
+              font-size: 0.85rem;
+              font-weight: 500;
+              margin-left: 0.5rem;
+            }
+          }
+
+          ion-input,
+          ion-select {
+            --padding-start: 0.75rem;
+            --padding-end: 0.75rem;
+            --padding-top: 0.75rem;
+            --padding-bottom: 0.75rem;
+            background: white;
+            border: 2px solid var(--ion-color-light);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            min-height: 44px;
+          }
+
+          ion-toggle {
+            --track-background: rgba(var(--ion-color-primary-rgb), 0.2);
+            --track-background-checked: rgba(var(--ion-color-primary-rgb));
+            --handle-background: rgba(var(--ion-color-primary-rgb));
+            --handle-background-checked: white;
+            flex: 0 0 auto;
+            width: auto;
+          }
+        }
+      }
+    }
+
     .quantity-controls {
       display: flex;
       align-items: center;

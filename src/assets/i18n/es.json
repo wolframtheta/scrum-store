@@ -49,7 +49,11 @@
     "FILTERS_OPTIONS": {
       "PRODUCER": "Productor",
       "SUPPLIER": "Proveedor"
-    }
+    },
+    "CUSTOMIZATION_OPTIONS": "Opciones de personalización",
+    "ENTER_VALUE": "Introduce un valor",
+    "SELECT_OPTION": "Selecciona una opción",
+    "REQUIRED_FIELDS": "Todos los campos obligatorios deben ser rellenados"
   },
   "ADD_TO_CART_MODAL": {
     "TITLE": "Añadir a la cesta",

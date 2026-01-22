@@ -49,7 +49,8 @@ export class OrdersService {
       items: cartItems.map(item => ({
         articleId: item.article.id,
         quantity: item.quantity,
-        ...(item.orderPeriodId && { orderPeriodId: item.orderPeriodId })
+        ...(item.orderPeriodId && { orderPeriodId: item.orderPeriodId }),
+        ...(item.selectedOptions && { selectedOptions: item.selectedOptions })
       }))
     };
 

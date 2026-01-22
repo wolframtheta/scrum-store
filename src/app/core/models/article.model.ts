@@ -32,6 +32,31 @@ export interface Article {
   // Campos adicionales para el aparador
   maxQuantity?: number;
   orderedQuantity?: number;
+  // Opciones de personalización
+  customizationOptions?: CustomizationOption[];
+}
+
+export interface CustomizationOption {
+  id: string;
+  title: string;
+  type: 'boolean' | 'numeric' | 'string' | 'select' | 'multiselect';
+  required?: boolean;
+  price?: number; // Preu addicional quan s'activa/selecciona aquesta opció
+  values?: CustomizationOptionValue[];
+}
+
+export interface CustomizationOptionValue {
+  id: string;
+  label: string;
+  price?: number; // Preu addicional per aquest valor específic (per select/multiselect)
+}
+
+export interface SelectedOption {
+  optionId: string;
+  title: string;
+  type: 'boolean' | 'numeric' | 'string' | 'select' | 'multiselect';
+  value: boolean | number | string | string[];
+  price?: number; // Preu addicional d'aquesta opció seleccionada
 }
 
 export interface ConsumerGroup {
@@ -65,5 +90,6 @@ export interface CartItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  selectedOptions?: SelectedOption[];
 }
 
