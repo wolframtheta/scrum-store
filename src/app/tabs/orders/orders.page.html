@@ -148,6 +148,17 @@
                   <span *ngIf="item.article?.city" class="city">· {{ item.article.city }}</span>
                 </div>
 
+                <!-- Customization Options -->
+                <div *ngIf="item.selectedOptions && item.selectedOptions.length > 0" class="customization-options">
+                  <div *ngFor="let option of item.selectedOptions" class="customization-option">
+                    <strong>{{ option.title }}:</strong>
+                    <span *ngIf="option.type === 'boolean'">{{ option.value ? 'Sí' : 'No' }}</span>
+                    <span *ngIf="option.type !== 'boolean' && option.type !== 'multiselect'">{{ option.value }}</span>
+                    <span *ngIf="option.type === 'multiselect'">{{ formatMultiselectValue(option.value) }}</span>
+                    <span *ngIf="option.price && option.price > 0" class="option-price">(+{{ formatPrice(option.price) }})</span>
+                  </div>
+                </div>
+
                 <!-- Item Details -->
                 <div class="item-pricing">
                   <div class="pricing-row price-unit">

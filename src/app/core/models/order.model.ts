@@ -23,6 +23,15 @@ export interface OrderItem {
     endDate: Date | string;
     deliveryDate: Date | string;
   };
+  selectedOptions?: SelectedOption[];
+}
+
+export interface SelectedOption {
+  optionId: string;
+  title: string;
+  type: 'boolean' | 'numeric' | 'string' | 'select' | 'multiselect';
+  value: boolean | number | string | string[];
+  price?: number; // Preu addicional d'aquesta opció seleccionada
 }
 
 export interface Order {

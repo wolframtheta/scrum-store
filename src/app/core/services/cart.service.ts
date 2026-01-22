@@ -97,14 +97,27 @@ export class CartService {
   }
 
   /**
-   * Calcular preus amb IVA
+   * Calcular preus amb IVA incloent personalitzacions
    */
-  private calculatePrices(pricePerUnit: number, quantity: number, taxRate: number = 0): {
+  private calculatePrices(pricePerUnit: number, quantity: number, taxRate: number = 0, selectedOptions?: SelectedOption[]): {
     totalPriceWithoutTax: number;
     taxAmount: number;
     totalPrice: number;
   } {
-    const totalPriceWithoutTax = pricePerUnit * quantity;
+    // Preu base de l'article
+    const basePrice = pricePerUnit * quantity;
+    
+    // Preu de les personalitzacions
+    let customizationPrice = 0;
+    if (selectedOptions && selectedOptions.length > 0) {
+      for (const option of selectedOptions) {
+        if (option.price && option.price > 0) {
+          customizationPrice += option.price * quantity;
+        }
+      }
+    }
+    
+    const totalPriceWithoutTax = basePrice + customizationPrice;
     const taxAmount = totalPriceWithoutTax * (taxRate / 100);
     const totalPrice = totalPriceWithoutTax + taxAmount;
     
@@ -127,7 +140,7 @@ export class CartService {
       : article.pricePerUnit;
 
     const taxRate = article.taxRate || 0;
-    const prices = this.calculatePrices(pricePerUnit, quantity, taxRate);
+    const prices = this.calculatePrices(pricePerUnit, quantity, taxRate, selectedOptions);
 
     // Extraer orderPeriodId si existe en el artículo
     const orderPeriodId = (article as any).orderPeriodId;
@@ -188,28 +201,34 @@ export class CartService {
    * Actualitzar quantitat d'un article
    */
   async updateQuantity(articleId: string, quantity: number): Promise<void> {
-    const items = [...this._items()];
-    const index = items.findIndex(item => item.article.id === articleId);
+    const currentItems = this._items();
+    const index = currentItems.findIndex(item => item.article.id === articleId);
 
     if (index >= 0 && quantity > 0) {
-      const article = items[index].article;
+      const item = currentItems[index];
+      const article = item.article;
       const pricePerUnit = typeof article.pricePerUnit === 'string'
         ? parseFloat(article.pricePerUnit)
         : article.pricePerUnit;
 
       const taxRate = article.taxRate || 0;
-      const prices = this.calculatePrices(pricePerUnit, quantity, taxRate);
+      const selectedOptions = item.selectedOptions; // Mantener las opciones seleccionadas
+      const prices = this.calculatePrices(pricePerUnit, quantity, taxRate, selectedOptions);
 
-      items[index] = {
-        article,
-        quantity,
-        totalPrice: prices.totalPrice,
-        totalPriceWithoutTax: prices.totalPriceWithoutTax,
-        taxAmount: prices.taxAmount,
-        orderPeriodId: items[index].orderPeriodId, // Mantener el periodId
-        selectedOptions: items[index].selectedOptions // Mantener las opciones seleccionadas
-      };
-      this._items.set(items);
+      // Crear un nou array amb un nou objecte per l'item actualitzat
+      const updatedItems = [
+        ...currentItems.slice(0, index),
+        {
+          ...item,
+          quantity,
+          totalPrice: prices.totalPrice,
+          totalPriceWithoutTax: prices.totalPriceWithoutTax,
+          taxAmount: prices.taxAmount,
+        },
+        ...currentItems.slice(index + 1)
+      ];
+      
+      this._items.set(updatedItems);
       await this.saveCart();
     } else if (index >= 0 && quantity <= 0) {
       // Si la quantitat és 0 o negativa, eliminar l'article

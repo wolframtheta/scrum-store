@@ -122,6 +122,13 @@ export class CartPage implements OnInit {
     return formatted.replace('.', ',');
   }
 
+  formatMultiselectValue(value: any): string {
+    if (Array.isArray(value)) {
+      return value.join(', ');
+    }
+    return String(value);
+  }
+
   async confirmOrder() {
     if (this.items().length === 0) {
       await this.showToast(this.translate.instant('CART.EMPTY_CART'), 'warning');

@@ -518,6 +518,41 @@ ion-header {
             }
           }
         }
+
+        .customization-options {
+          margin-top: 0.75rem;
+          padding: 0.75rem;
+          background: rgba(var(--ion-color-light-rgb), 0.5);
+          border-radius: 8px;
+          border-left: 3px solid var(--ion-color-primary);
+
+          .customization-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            strong {
+              color: var(--ion-color-dark);
+              font-weight: 600;
+            }
+
+            span:not(.option-price) {
+              color: var(--ion-color-medium);
+            }
+
+            .option-price {
+              color: var(--ion-color-success);
+              font-weight: 600;
+              margin-left: auto;
+            }
+          }
+        }
       }
     }
   }

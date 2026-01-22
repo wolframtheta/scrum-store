@@ -225,8 +225,24 @@ export class OrdersPage implements OnInit {
   getOrderSubtotalWithoutTax(order: Order): number {
     if (!order.items || order.items.length === 0) return 0;
     return order.items.reduce((sum, item) => {
-      const totalPrice = typeof item.totalPrice === 'string' ? parseFloat(item.totalPrice) : (item.totalPrice || 0);
-      return sum + totalPrice;
+      // totalPrice del backend ja és sense IVA (segons la documentació)
+      // Però per estar segurs, calculem el subtotal sense IVA basant-nos en pricePerUnit i quantity
+      const pricePerUnit = typeof item.pricePerUnit === 'string' ? parseFloat(item.pricePerUnit) : (item.pricePerUnit || 0);
+      const quantity = typeof item.quantity === 'string' ? parseFloat(item.quantity) : (item.quantity || 0);
+      
+      // Preu base de l'article
+      let basePrice = pricePerUnit * quantity;
+      
+      // Afegir preu de les personalitzacions
+      if (item.selectedOptions && item.selectedOptions.length > 0) {
+        for (const option of item.selectedOptions) {
+          if (option.price && option.price > 0) {
+            basePrice += option.price * quantity;
+          }
+        }
+      }
+      
+      return sum + basePrice;
     }, 0);
   }
 
@@ -240,9 +256,22 @@ export class OrdersPage implements OnInit {
       const taxRate = typeof item.article?.taxRate === 'string' 
         ? parseFloat(item.article.taxRate) 
         : (item.article?.taxRate || 0);
-      const subtotal = typeof item.totalPrice === 'string' 
-        ? parseFloat(item.totalPrice) 
-        : (item.totalPrice || 0);
+      
+      // Calcular subtotal sense IVA (incloent personalitzacions)
+      const pricePerUnit = typeof item.pricePerUnit === 'string' ? parseFloat(item.pricePerUnit) : (item.pricePerUnit || 0);
+      const quantity = typeof item.quantity === 'string' ? parseFloat(item.quantity) : (item.quantity || 0);
+      
+      let subtotal = pricePerUnit * quantity;
+      
+      // Afegir preu de les personalitzacions
+      if (item.selectedOptions && item.selectedOptions.length > 0) {
+        for (const option of item.selectedOptions) {
+          if (option.price && option.price > 0) {
+            subtotal += option.price * quantity;
+          }
+        }
+      }
+      
       const taxAmount = subtotal * (taxRate / 100);
       
       if (taxMap.has(taxRate)) {
@@ -276,9 +305,31 @@ export class OrdersPage implements OnInit {
 
   // Calcula el total amb IVA d'un article
   getItemTotalWithTax(item: any): number {
-    const subtotal = typeof item.totalPrice === 'string' ? parseFloat(item.totalPrice) : (item.totalPrice || 0);
+    // Calcular subtotal sense IVA (incloent personalitzacions)
+    const pricePerUnit = typeof item.pricePerUnit === 'string' ? parseFloat(item.pricePerUnit) : (item.pricePerUnit || 0);
+    const quantity = typeof item.quantity === 'string' ? parseFloat(item.quantity) : (item.quantity || 0);
+    
+    let subtotal = pricePerUnit * quantity;
+    
+    // Afegir preu de les personalitzacions
+    if (item.selectedOptions && item.selectedOptions.length > 0) {
+      for (const option of item.selectedOptions) {
+        if (option.price && option.price > 0) {
+          subtotal += option.price * quantity;
+        }
+      }
+    }
+    
     const taxRate = typeof item.article?.taxRate === 'string' ? parseFloat(item.article.taxRate) : (item.article?.taxRate || 0);
     return subtotal * (1 + taxRate / 100);
+  }
+
+  // Formatea el valor de multiselect
+  formatMultiselectValue(value: any): string {
+    if (Array.isArray(value)) {
+      return value.join(', ');
+    }
+    return String(value);
   }
 
   // Comprova si una comanda té pagaments
