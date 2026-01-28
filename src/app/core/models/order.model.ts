@@ -2,7 +2,6 @@ import { Article } from './article.model';
 
 export enum PaymentStatus {
   UNPAID = 'unpaid',
-  PARTIAL = 'partial',
   PAID = 'paid',
 }
 
@@ -13,7 +12,6 @@ export interface OrderItem {
   quantity: number;
   pricePerUnit: number;
   totalPrice: number;
-  paidAmount?: number;
   periodId?: string;
   period?: {
     id: string;
