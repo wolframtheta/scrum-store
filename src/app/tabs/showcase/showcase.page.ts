@@ -38,6 +38,7 @@ import { addIcons } from 'ionicons';
 import { addOutline, leafOutline, storefrontOutline, locationOutline, personOutline, businessOutline, closeCircleOutline, funnelOutline, closeOutline, checkmarkOutline, closeCircle, close, cartOutline, removeOutline, timeOutline, calendarOutline } from 'ionicons/icons';
 import { ShowcaseService } from '../../core/services/showcase.service';
 import { ConsumerGroupService } from '../../core/services/consumer-group.service';
+import { removeAccents } from '../../core/utils/string.utils';
 import { CartService } from '../../core/services/cart.service';
 import { ShowcasePeriod, ShowcaseArticleItem } from '../../core/models/order-period.model';
 import { SelectedOption } from '../../core/models/article.model';
@@ -190,7 +191,7 @@ export class ShowcasePage implements OnInit {
   // Computed: filtrar períodes per cerca i filtres
   filteredPeriods = computed(() => {
     let periods = this.allPeriods();
-    const search = this.searchText().toLowerCase().trim();
+    const search = removeAccents(this.searchText().trim());
 
     if (!search && this.selectedCategories().length === 0 &&
         this.selectedProducts().length === 0 && this.selectedVarieties().length === 0 &&
@@ -202,14 +203,14 @@ export class ShowcasePage implements OnInit {
     return periods.map(period => {
       let articles = period.articles;
 
-      // Filtre per cerca
+      // Filtre per cerca (sense accents)
       if (search) {
         articles = articles.filter((article: ShowcaseArticleItem) =>
-          article.product?.toLowerCase().includes(search) ||
-          article.variety?.toLowerCase().includes(search) ||
-          article.description?.toLowerCase().includes(search) ||
-          article.producerName?.toLowerCase().includes(search) ||
-          article.category?.toLowerCase().includes(search)
+          (article.product && removeAccents(article.product).includes(search)) ||
+          (article.variety && removeAccents(article.variety).includes(search)) ||
+          (article.description && removeAccents(article.description).includes(search)) ||
+          (article.producerName && removeAccents(article.producerName).includes(search)) ||
+          (article.category && removeAccents(article.category).includes(search))
         );
       }
 
