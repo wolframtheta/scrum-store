@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -11,7 +12,6 @@ import {
   IonBadge,
   IonSegment,
   IonSegmentButton,
-  IonModal,
   IonButtons,
   IonIcon,
   IonButton,
@@ -22,11 +22,9 @@ import { addIcons } from 'ionicons';
 import {
   receiptOutline,
   cartOutline,
-  calculatorOutline,
   leafOutline,
   pricetagOutline,
   cubeOutline,
-  closeOutline,
   personOutline
 } from 'ionicons/icons';
 import { OrdersService } from '../../core/services/orders.service';
@@ -51,7 +49,6 @@ import { Order, PaymentStatus } from '../../core/models/order.model';
     IonBadge,
     IonSegment,
     IonSegmentButton,
-    IonModal,
     IonButtons,
     IonIcon,
     IonButton,
@@ -62,7 +59,7 @@ export class OrdersPage implements OnInit {
   isLoading = signal(false);
 
   // Orders & Filters
-  selectedPaymentTab = signal<string>('all');
+  selectedPaymentTab = signal<string>('unpaid');
   userOrders = computed(() => {
     const allOrders = this.ordersService.getUserOrders();
     const tab = this.selectedPaymentTab();
@@ -70,47 +67,25 @@ export class OrdersPage implements OnInit {
     if (tab === 'all') return allOrders;
 
     return allOrders.filter((order: Order) => {
-      if (!order.paymentStatus) return tab === 'unpaid'; // Old orders without paymentStatus
+      if (!order.paymentStatus) return tab === 'unpaid';
+      if (tab === 'unpaid') return order.paymentStatus === PaymentStatus.UNPAID || order.paymentStatus === PaymentStatus.PARTIAL;
       return order.paymentStatus === tab;
     });
   });
-
-  unpaidCount = computed(() =>
-    this.ordersService.getUserOrders().filter((o: Order) =>
-      !o.paymentStatus || o.paymentStatus === PaymentStatus.UNPAID
-    ).length
-  );
-
-  partialCount = computed(() =>
-    this.ordersService.getUserOrders().filter((o: Order) =>
-      o.paymentStatus === PaymentStatus.PARTIAL
-    ).length
-  );
-
-  paidCount = computed(() =>
-    this.ordersService.getUserOrders().filter((o: Order) =>
-      o.paymentStatus === PaymentStatus.PAID
-    ).length
-  );
-
-  // Order detail modal
-  isOrderDetailOpen = signal(false);
-  selectedOrder = signal<Order | null>(null);
 
   readonly PaymentStatus = PaymentStatus;
 
   constructor(
     private ordersService: OrdersService,
-    private consumerGroupService: ConsumerGroupService
+    private consumerGroupService: ConsumerGroupService,
+    private router: Router
   ) {
     addIcons({
       receiptOutline,
       cartOutline,
-      calculatorOutline,
       leafOutline,
       pricetagOutline,
       cubeOutline,
-      closeOutline,
       personOutline
     });
 
@@ -173,22 +148,6 @@ export class OrdersPage implements OnInit {
     
     // Format with 2 decimals
     return `${numPrice.toFixed(2).replace('.', ',')} €`;
-  }
-
-  formatQuantity(quantity: number | string | undefined | null): string {
-    if (quantity === undefined || quantity === null) return '0';
-    
-    const numQuantity = typeof quantity === 'string' ? parseFloat(quantity) : quantity;
-    if (isNaN(numQuantity)) return '0';
-    
-    // Si és un número enter, retornar sense decimals
-    if (numQuantity % 1 === 0) {
-      return numQuantity.toString();
-    }
-    
-    // Si té decimals, eliminar zeros innecessaris i convertir punt a coma
-    const formatted = numQuantity.toString().replace(/\.?0+$/, '');
-    return formatted.replace('.', ',');
   }
 
   getPaymentStatusLabel(order: Order): string {
@@ -303,63 +262,14 @@ export class OrdersPage implements OnInit {
     return Math.max(0, totalWithTax - paid);
   }
 
-  // Calcula el total amb IVA d'un article
-  getItemTotalWithTax(item: any): number {
-    // Calcular subtotal sense IVA (incloent personalitzacions)
-    const pricePerUnit = typeof item.pricePerUnit === 'string' ? parseFloat(item.pricePerUnit) : (item.pricePerUnit || 0);
-    const quantity = typeof item.quantity === 'string' ? parseFloat(item.quantity) : (item.quantity || 0);
-    
-    let subtotal = pricePerUnit * quantity;
-    
-    // Afegir preu de les personalitzacions
-    if (item.selectedOptions && item.selectedOptions.length > 0) {
-      for (const option of item.selectedOptions) {
-        if (option.price && option.price > 0) {
-          subtotal += option.price * quantity;
-        }
-      }
-    }
-    
-    const taxRate = typeof item.article?.taxRate === 'string' ? parseFloat(item.article.taxRate) : (item.article?.taxRate || 0);
-    return subtotal * (1 + taxRate / 100);
-  }
-
-  // Formatea el valor de multiselect
-  formatMultiselectValue(value: any): string {
-    if (Array.isArray(value)) {
-      return value.join(', ');
-    }
-    return String(value);
-  }
-
-  // Comprova si una comanda té pagaments
   hasPayments(order: Order | null): boolean {
     if (!order) return false;
     const paidAmount = typeof order.paidAmount === 'string' ? parseFloat(order.paidAmount) : (order.paidAmount || 0);
     return paidAmount > 0;
   }
 
-  async openOrderDetail(order: Order) {
-    console.log('Opening order detail:', order);
-
-    // Open modal immediately with current data
-    this.selectedOrder.set(order);
-    this.isOrderDetailOpen.set(true);
-
-    // Then fetch fresh data from backend
-    try {
-      const freshOrder = await this.ordersService.getOrderById(order.id);
-      console.log('Fresh order from backend:', freshOrder);
-      this.selectedOrder.set(freshOrder);
-    } catch (error) {
-      console.error('Error loading order detail:', error);
-      // Keep showing the data we already have
-    }
-  }
-
-  closeOrderDetail() {
-    this.isOrderDetailOpen.set(false);
-    setTimeout(() => this.selectedOrder.set(null), 300);
+  openOrderDetail(order: Order) {
+    this.router.navigate(['/tabs/orders', order.id]);
   }
 }
 

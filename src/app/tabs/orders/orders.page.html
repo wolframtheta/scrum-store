@@ -5,6 +5,19 @@
       {{ 'TABS.COMANDES' | translate }}
     </ion-title>
   </ion-toolbar>
+  <ion-toolbar color="primary" class="tabs-toolbar">
+    <ion-segment [(ngModel)]="selectedPaymentTab" class="payment-tabs">
+      <ion-segment-button value="all">
+        <ion-label>{{ 'PROFILE.ORDERS_TAB_ALL' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="unpaid">
+        <ion-label>{{ 'PROFILE.ORDERS_TAB_UNPAID' | translate }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="paid">
+        <ion-label>{{ 'PROFILE.ORDERS_TAB_PAID' | translate }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="orders-content-page">
@@ -20,31 +33,6 @@
   </div>
 
   <div *ngIf="!isLoading()" class="orders-container">
-    <!-- Payment Status Tabs -->
-    <ion-segment [(ngModel)]="selectedPaymentTab" class="payment-tabs">
-      <ion-segment-button value="all">
-        <ion-label>{{ 'PROFILE.ORDERS_TAB_ALL' | translate }}</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="unpaid">
-        <ion-label>
-          {{ 'PROFILE.ORDERS_TAB_UNPAID' | translate }}
-          <ion-badge *ngIf="unpaidCount() > 0">{{ unpaidCount() }}</ion-badge>
-        </ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="partial">
-        <ion-label>
-          {{ 'PROFILE.ORDERS_TAB_PARTIAL' | translate }}
-          <ion-badge *ngIf="partialCount() > 0">{{ partialCount() }}</ion-badge>
-        </ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="paid">
-        <ion-label>
-          {{ 'PROFILE.ORDERS_TAB_PAID' | translate }}
-          <ion-badge *ngIf="paidCount() > 0">{{ paidCount() }}</ion-badge>
-        </ion-label>
-      </ion-segment-button>
-    </ion-segment>
-
     <div *ngIf="userOrders().length === 0" class="no-orders">
       <ion-icon name="cart-outline" class="no-orders-icon"></ion-icon>
       <p>{{ 'PROFILE.NO_ORDERS' | translate }}</p>
@@ -81,169 +69,5 @@
       </div>
     </div>
   </div>
-
-  <!-- Order Detail Modal -->
-  <ion-modal
-    [isOpen]="isOrderDetailOpen()"
-    (didDismiss)="closeOrderDetail()"
-    class="order-detail-modal">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar color="primary">
-          <ion-title>{{ 'PROFILE.ORDER_DETAIL' | translate }}</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="closeOrderDetail()">
-              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-
-      <ion-content class="order-detail-content">
-        <div *ngIf="selectedOrder()" class="detail-container">
-          <!-- Order Info -->
-          <div class="order-info-card">
-            <div class="info-header">
-              <div>
-                <h2>{{ 'PROFILE.ORDER' | translate }} #{{ selectedOrder()!.id.slice(-8) }}</h2>
-                <p class="order-date-detail">{{ formatDate(selectedOrder()!.createdAt) }}</p>
-              </div>
-              <ion-badge [color]="getPaymentStatusColor(selectedOrder()!)" class="status-badge-large">
-                {{ getPaymentStatusLabel(selectedOrder()!) | translate }}
-              </ion-badge>
-            </div>
-          </div>
-
-          <!-- Order Items -->
-          <div class="items-section">
-            <h3 class="section-title">{{ 'PROFILE.ORDER_ITEMS' | translate }} ({{ selectedOrder()!.items.length }})</h3>
-
-            <ion-card *ngFor="let item of selectedOrder()!.items" class="item-card">
-              <div class="item-detail">
-                <!-- Item Header -->
-                <div class="item-main">
-                  <div class="item-image" *ngIf="item.article?.image">
-                    <img [src]="item.article.image" [alt]="item.article.product || item.article.name">
-                  </div>
-                  <div class="item-image placeholder" *ngIf="!item.article?.image">
-                    <ion-icon name="cart-outline"></ion-icon>
-                  </div>
-
-                  <div class="item-info">
-                    <div class="item-title">
-                      <span class="item-category">{{ item.article?.category || '' }}</span>
-                      <h4>{{ item.article?.product || ('PROFILE.ARTICLE' | translate) }}</h4>
-                      <p *ngIf="item.article?.variety" class="item-variety">{{ item.article.variety }}</p>
-                    </div>
-                    <ion-badge *ngIf="item.article?.isSeasonal" color="success" class="seasonal-badge-small">
-                      <ion-icon name="leaf-outline"></ion-icon>
-                    </ion-badge>
-                  </div>
-                </div>
-
-                <!-- Producer info if available -->
-                <div class="producer-info" *ngIf="item.article?.producerName">
-                  <ion-icon name="person-outline"></ion-icon>
-                  <span>{{ item.article.producerName }}</span>
-                  <span *ngIf="item.article?.city" class="city">· {{ item.article.city }}</span>
-                </div>
-
-                <!-- Customization Options -->
-                <div *ngIf="item.selectedOptions && item.selectedOptions.length > 0" class="customization-options">
-                  <div *ngFor="let option of item.selectedOptions" class="customization-option">
-                    <strong>{{ option.title }}:</strong>
-                    <span *ngIf="option.type === 'boolean'">{{ option.value ? 'Sí' : 'No' }}</span>
-                    <span *ngIf="option.type !== 'boolean' && option.type !== 'multiselect'">{{ option.value }}</span>
-                    <span *ngIf="option.type === 'multiselect'">{{ formatMultiselectValue(option.value) }}</span>
-                    <span *ngIf="option.price && option.price > 0" class="option-price">(+{{ formatPrice(option.price) }})</span>
-                  </div>
-                </div>
-
-                <!-- Item Details -->
-                <div class="item-pricing">
-                  <div class="pricing-row price-unit">
-                    <div class="label-group">
-                      <ion-icon name="pricetag-outline"></ion-icon>
-                      <span class="label">{{ 'PROFILE.PRICE_PER_UNIT' | translate }}</span>
-                    </div>
-                    <span class="value">{{ formatPrice(item.pricePerUnit) }}/{{ item.article?.unitMeasure || 'ud' }}</span>
-                  </div>
-
-                  <div class="pricing-row quantity">
-                    <div class="label-group">
-                      <ion-icon name="cube-outline"></ion-icon>
-                      <span class="label">{{ 'PROFILE.QUANTITY' | translate }}</span>
-                    </div>
-                    <span class="value-quantity">
-                      <span class="number">{{ formatQuantity(item.quantity) }}</span>
-                      <span class="unit">{{ item.article?.unitMeasure || 'ud' }}</span>
-                    </span>
-                  </div>
-
-                  <div class="pricing-row subtotal">
-                    <div class="label-group">
-                      <ion-icon name="calculator-outline"></ion-icon>
-                      <span class="label">{{ 'PROFILE.SUBTOTAL' | translate }}</span>
-                    </div>
-                    <span class="value">{{ formatPrice(item.totalPrice) }}</span>
-                  </div>
-
-                  <div class="pricing-row tax" *ngIf="item.article?.taxRate && (item.article?.taxRate ?? 0) > 0">
-                    <div class="label-group">
-                      <span class="label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ item.article?.taxRate }}%)</span>
-                    </div>
-                    <span class="value">{{ formatPrice((item.totalPrice || 0) * ((item.article?.taxRate || 0) / 100)) }}</span>
-                  </div>
-
-                  <div class="pricing-row total">
-                    <div class="label-group">
-                      <span class="label">{{ 'CART.TOTAL' | translate }}</span>
-                    </div>
-                    <span class="value-total">{{ formatPrice(getItemTotalWithTax(item)) }}</span>
-                  </div>
-                </div>
-              </div>
-            </ion-card>
-          </div>
-        </div>
-      </ion-content>
-
-      <ion-toolbar class="modal-footer">
-        <div class="footer-content">
-          <div class="total-section">
-            <div class="items-count-header">
-              <span>{{ selectedOrder()!.items.length }} {{ 'PROFILE.ITEMS' | translate }}</span>
-            </div>
-            
-            <!-- Desglossament de preus -->
-            <div class="total-breakdown">
-              <div class="total-line" *ngIf="getOrderSubtotalWithoutTax(selectedOrder()!) > 0">
-                <span class="total-label">{{ 'CART.SUBTOTAL_WITHOUT_TAX' | translate }}:</span>
-                <span class="total-value">{{ formatPrice(getOrderSubtotalWithoutTax(selectedOrder()!)) }}</span>
-              </div>
-              <ng-container *ngFor="let tax of getOrderTaxSummary(selectedOrder()!)">
-                <div *ngIf="tax.taxAmount > 0" class="total-line">
-                  <span class="total-label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ tax.taxRate }}%):</span>
-                  <span class="total-value">{{ formatPrice(tax.taxAmount) }}</span>
-                </div>
-              </ng-container>
-              <div class="total-line final">
-                <span class="total-label">{{ 'CART.TOTAL' | translate }}:</span>
-                <span class="total-price">{{ formatPrice(getOrderTotalWithTax(selectedOrder()!)) }}</span>
-              </div>
-              <div class="total-line paid" *ngIf="hasPayments(selectedOrder())">
-                <span class="total-label">{{ 'PROFILE.PAID' | translate }}:</span>
-                <span class="total-value paid">{{ formatPrice(selectedOrder()!.paidAmount) }}</span>
-              </div>
-              <div class="total-line pending" *ngIf="getTotalToPay(selectedOrder()!) > 0">
-                <span class="total-label">{{ 'PROFILE.TOTAL_TO_PAY' | translate }}:</span>
-                <span class="total-price pending">{{ formatPrice(getTotalToPay(selectedOrder()!)) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </ion-toolbar>
-    </ng-template>
-  </ion-modal>
 </ion-content>
 
