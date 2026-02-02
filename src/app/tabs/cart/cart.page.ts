@@ -28,6 +28,7 @@ import {
 } from 'ionicons/icons';
 import { CartService, CartItem } from '../../core/services/cart.service';
 import { OrdersService } from '../../core/services/orders.service';
+import { getErrorMessage } from '../../core/models/http-error.model';
 
 @Component({
   selector: 'app-cart',
@@ -129,9 +130,27 @@ export class CartPage implements OnInit {
     return String(value);
   }
 
+  private toDateStr(d: Date | string): string {
+    const date = typeof d === 'string' ? new Date(d) : d;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
   async confirmOrder() {
     if (this.items().length === 0) {
       await this.showToast(this.translate.instant('CART.EMPTY_CART'), 'warning');
+      return;
+    }
+
+    const todayStr = this.toDateStr(new Date());
+    const expiredItem = this.items().find(item => {
+      const endDate = item.periodEndDate;
+      return endDate && todayStr > endDate;
+    });
+    if (expiredItem) {
+      await this.showToast(this.translate.instant('CART.ORDER_PERIOD_EXPIRED'), 'warning');
       return;
     }
 
@@ -166,7 +185,8 @@ export class CartPage implements OnInit {
       await this.showToast(this.translate.instant('CART.ORDER_SUCCESS'), 'success');
     } catch (error) {
       console.error('Error processing order:', error);
-      await this.showToast(this.translate.instant('COMMON.ERROR'), 'danger');
+      const msg = getErrorMessage(error, this.translate.instant('COMMON.ERROR'));
+      await this.showToast(msg, 'danger');
     }
   }
 

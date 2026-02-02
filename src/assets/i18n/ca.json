@@ -80,7 +80,8 @@
     "CONFIRM_ORDER_TITLE": "Confirmar comanda",
     "CONFIRM_ORDER_MESSAGE": "Estàs segur que vols tramitar aquesta comanda?",
     "CONFIRM_BUTTON": "Confirmar",
-    "ORDER_SUCCESS": "Comanda tramitada correctament"
+    "ORDER_SUCCESS": "Comanda tramitada correctament",
+    "ORDER_PERIOD_EXPIRED": "No es pot tramitar la comanda: el termini per comandar ha passat"
   },
   "TABS": {
     "APARADOR": "Aparador",

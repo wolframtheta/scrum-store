@@ -8,7 +8,8 @@ export interface CartItem {
   totalPrice: number; // Preu total amb IVA
   totalPriceWithoutTax: number; // Preu total sense IVA
   taxAmount: number; // Quantitat d'IVA
-  orderPeriodId?: string; // Nou: ID del període de pedido
+  orderPeriodId?: string; // ID del període de comanda
+  periodEndDate?: string; // YYYY-MM-DD data límit per comandar (per validar si avui > endDate)
   selectedOptions?: SelectedOption[]; // Opciones personalizadas seleccionadas
 }
 
@@ -142,8 +143,9 @@ export class CartService {
     const taxRate = article.taxRate || 0;
     const prices = this.calculatePrices(pricePerUnit, quantity, taxRate, selectedOptions);
 
-    // Extraer orderPeriodId si existe en el artículo
+    // Extraer orderPeriodId i periodEndDate si existeixen en l'article
     const orderPeriodId = (article as any).orderPeriodId;
+    const periodEndDate = (article as any).periodEndDate;
 
     if (existingIndex >= 0) {
       // Actualitzar quantitat si ja existeix
@@ -154,6 +156,7 @@ export class CartService {
         totalPriceWithoutTax: prices.totalPriceWithoutTax,
         taxAmount: prices.taxAmount,
         orderPeriodId,
+        periodEndDate,
         selectedOptions
       };
     } else {
@@ -165,6 +168,7 @@ export class CartService {
         totalPriceWithoutTax: prices.totalPriceWithoutTax,
         taxAmount: prices.taxAmount,
         orderPeriodId,
+        periodEndDate,
         selectedOptions
       });
     }

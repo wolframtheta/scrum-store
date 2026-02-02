@@ -79,7 +79,8 @@
     "CONFIRM_ORDER_TITLE": "Confirmar pedido",
     "CONFIRM_ORDER_MESSAGE": "¿Estás seguro de que quieres tramitar este pedido?",
     "CONFIRM_BUTTON": "Confirmar",
-    "ORDER_SUCCESS": "Pedido tramitado correctamente"
+    "ORDER_SUCCESS": "Pedido tramitado correctamente",
+    "ORDER_PERIOD_EXPIRED": "No se puede tramitar el pedido: el plazo para pedir ha pasado"
   },
   "TABS": {
     "APARADOR": "Escaparate",

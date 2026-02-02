@@ -42,6 +42,7 @@ import { removeAccents } from '../../core/utils/string.utils';
 import { CartService } from '../../core/services/cart.service';
 import { ShowcasePeriod, ShowcaseArticleItem } from '../../core/models/order-period.model';
 import { SelectedOption } from '../../core/models/article.model';
+import { getErrorMessage } from '../../core/models/http-error.model';
 
 @Component({
   selector: 'app-showcase',
@@ -526,8 +527,16 @@ export class ShowcasePage implements OnInit {
     }
   }
 
+  private toDateStr(d: Date | string): string {
+    const date = typeof d === 'string' ? new Date(d) : d;
+    return date.toISOString().split('T')[0];
+  }
+
   private async addToCartWithQuantity(article: ShowcaseArticleItem, periodId: string, quantity: number) {
     try {
+      const period = this.allPeriods().find(p => p.periodId === periodId);
+      const periodEndDate = period?.endDate ? this.toDateStr(period.endDate) : undefined;
+
       // Convertir ShowcaseArticleItem a formato Article para el cart
       const cartArticle = {
         id: article.articleId,
@@ -543,7 +552,8 @@ export class ShowcasePage implements OnInit {
         isSeasonal: article.isSeasonal,
         description: article.description,
         city: article.city,
-        orderPeriodId: periodId
+        orderPeriodId: periodId,
+        periodEndDate
       } as any;
 
       // Preparar opciones seleccionadas amb preus
@@ -599,7 +609,8 @@ export class ShowcasePage implements OnInit {
       await this.showToast(this.translate.instant('SHOWCASE.ADDED_TO_CART'), 'success');
     } catch (error) {
       console.error('Error adding to cart:', error);
-      await this.showToast(this.translate.instant('COMMON.ERROR'), 'danger');
+      const msg = getErrorMessage(error, this.translate.instant('COMMON.ERROR'));
+      await this.showToast(msg, 'danger');
     }
   }
 
