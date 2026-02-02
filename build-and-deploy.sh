@@ -3,7 +3,7 @@
 set -e
 
 DEPLOY_HOST="root@46.62.250.143"
-DEPLOY_PATH="/dades/scrum-store"
+DEPLOY_PATH="/dades/www/app"
 
 # Verificar que estamos en un repositorio git
 if [ ! -d ".git" ]; then

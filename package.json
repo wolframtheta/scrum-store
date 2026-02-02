@@ -11,7 +11,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "deploy": "rsync -avz www/ root@46.62.250.143:/dades/scrum-store/"
+    "deploy": "rsync -avz www/ root@46.62.250.143:/dades/www/app/"
   },
   "private": true,
   "dependencies": {
