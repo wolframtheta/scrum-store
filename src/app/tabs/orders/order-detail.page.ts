@@ -28,6 +28,7 @@ import {
 } from 'ionicons/icons';
 import { OrdersService } from '../../core/services/orders.service';
 import { Order, PaymentStatus } from '../../core/models/order.model';
+import { getErrorMessage } from '../../core/models/http-error.model';
 
 @Component({
   selector: 'app-order-detail',
@@ -89,7 +90,7 @@ export class OrderDetailPage implements OnInit {
       this.order.set(order);
     } catch (err) {
       console.error('Error loading order:', err);
-      this.error.set('Error carregant la comanda');
+      this.error.set(getErrorMessage(err, 'Error carregant la comanda'));
     } finally {
       this.isLoading.set(false);
     }

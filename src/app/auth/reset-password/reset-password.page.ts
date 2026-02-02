@@ -12,6 +12,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ApiService } from '../../core/services/api.service';
+import { getErrorMessage } from '../../core/models/http-error.model';
 import { firstValueFrom } from 'rxjs';
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
@@ -134,8 +135,9 @@ export class ResetPasswordPage implements OnInit {
           await this.router.navigate(['/login']);
         }
       }, 2000);
-    } catch (error: any) {
-      const errorMessage = error?.error?.message || await this.translate.get('RESET_PASSWORD.ERROR').toPromise();
+    } catch (error) {
+      const fallback = await this.translate.get('RESET_PASSWORD.ERROR').toPromise();
+      const errorMessage = getErrorMessage(error, fallback);
       const toast = await this.toastController.create({
         message: errorMessage,
         duration: 3000,

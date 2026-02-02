@@ -14,6 +14,7 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
 import { ConsumerGroupService } from '../../core/services/consumer-group.service';
+import { getErrorMessage } from '../../core/models/http-error.model';
 import { ToastController } from '@ionic/angular';
 import { GroupSelectorModalComponent } from '../components/group-selector-modal.component';
 import { firstValueFrom } from 'rxjs';
@@ -108,7 +109,8 @@ export class LoginPage implements OnInit {
       },
       error: (error) => {
         console.error('Login error:', error);
-        this.showToast(this.translate.instant('LOGIN.ERRORS.LOGIN_FAILED'), 'danger');
+        const msg = getErrorMessage(error, this.translate.instant('LOGIN.ERRORS.LOGIN_FAILED'));
+        this.showToast(msg, 'danger');
         this.isLoading = false;
       }
     });

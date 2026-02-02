@@ -45,6 +45,7 @@ import {
 } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { ConsumerGroupService } from '../../core/services/consumer-group.service';
+import { getErrorMessage } from '../../core/models/http-error.model';
 import { NoticesService } from '../../core/services/notices.service';
 import { VersionService } from '../../core/services/version.service';
 import { User } from '../../core/models/auth.model';
@@ -216,7 +217,8 @@ export class ProfilePage implements OnInit {
       // El servicio de auth ya redirige al login
     } catch (error) {
       console.error('Error during logout:', error);
-      this.showToast(this.translate.instant('PROFILE.LOGOUT_ERROR'), 'danger');
+      const msg = getErrorMessage(error, this.translate.instant('PROFILE.LOGOUT_ERROR'));
+      this.showToast(msg, 'danger');
       this.isLoading.set(false);
     }
   }
