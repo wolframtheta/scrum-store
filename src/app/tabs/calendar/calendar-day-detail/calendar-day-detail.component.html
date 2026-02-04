@@ -1,0 +1,93 @@
+@if (inline()) {
+  <div class="day-detail-inline">
+    <div class="day-detail-inline-header">
+      <h2 class="day-detail-inline-title">{{ dateLabel() }}</h2>
+      <ion-button fill="clear" size="small" (click)="onClose()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </div>
+    <div class="day-detail-inline-body">
+      <section class="day-detail-section">
+        <h3>{{ 'PROFILE.CALENDAR_WHO_VOTED' | translate }}</h3>
+        @if (votes().length > 0) {
+          <ion-list lines="none" class="votes-list">
+            @for (v of votes(); track v.userName + v.status) {
+              <ion-item>
+                <ion-label>{{ v.userName }}</ion-label>
+                <span class="vote-badge" [attr.data-vote]="v.status">{{ voteLabel(v.status) | translate }}</span>
+              </ion-item>
+            }
+          </ion-list>
+        }
+      </section>
+      <section class="day-detail-section">
+        <h3>{{ 'PROFILE.CALENDAR_MY_VOTE' | translate }}</h3>
+        @if (saving()) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          <div class="vote-actions">
+            <ion-button size="small" [fill]="myVote() === 'yes' ? 'solid' : 'outline'" color="success" (click)="onSetVote('yes')">
+              {{ 'PROFILE.CALENDAR_VOTE_YES' | translate }}
+            </ion-button>
+            <ion-button size="small" [fill]="myVote() === 'if_needed' ? 'solid' : 'outline'" color="warning" (click)="onSetVote('if_needed')">
+              {{ 'PROFILE.CALENDAR_VOTE_IF_NEEDED' | translate }}
+            </ion-button>
+            <ion-button size="small" [fill]="myVote() === 'no' ? 'solid' : 'outline'" color="danger" (click)="onSetVote('no')">
+              {{ 'PROFILE.CALENDAR_VOTE_NO' | translate }}
+            </ion-button>
+            <ion-button size="small" fill="clear" (click)="onClearVote()">
+              {{ 'PROFILE.CALENDAR_CLEAR_VOTE' | translate }}
+            </ion-button>
+          </div>
+        }
+      </section>
+    </div>
+  </div>
+} @else {
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>{{ 'PROFILE.CALENDAR_DAY_DETAIL' | translate }} {{ dateLabel() }}</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="onClose()">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="ion-padding">
+    <section class="day-detail-section">
+      <h3>{{ 'PROFILE.CALENDAR_WHO_VOTED' | translate }}</h3>
+      @if (votes().length > 0) {
+        <ion-list lines="none" class="votes-list">
+          @for (v of votes(); track v.userName + v.status) {
+            <ion-item>
+              <ion-label>{{ v.userName }}</ion-label>
+              <span class="vote-badge" [attr.data-vote]="v.status">{{ voteLabel(v.status) | translate }}</span>
+            </ion-item>
+          }
+        </ion-list>
+      }
+    </section>
+    <section class="day-detail-section">
+      <h3>{{ 'PROFILE.CALENDAR_MY_VOTE' | translate }}</h3>
+      @if (saving()) {
+        <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+        <div class="vote-actions">
+          <ion-button size="small" [fill]="myVote() === 'yes' ? 'solid' : 'outline'" color="success" (click)="onSetVote('yes')">
+            {{ 'PROFILE.CALENDAR_VOTE_YES' | translate }}
+          </ion-button>
+          <ion-button size="small" [fill]="myVote() === 'if_needed' ? 'solid' : 'outline'" color="warning" (click)="onSetVote('if_needed')">
+            {{ 'PROFILE.CALENDAR_VOTE_IF_NEEDED' | translate }}
+          </ion-button>
+          <ion-button size="small" [fill]="myVote() === 'no' ? 'solid' : 'outline'" color="danger" (click)="onSetVote('no')">
+            {{ 'PROFILE.CALENDAR_VOTE_NO' | translate }}
+          </ion-button>
+          <ion-button size="small" fill="clear" (click)="onClearVote()">
+            {{ 'PROFILE.CALENDAR_CLEAR_VOTE' | translate }}
+          </ion-button>
+        </div>
+      }
+    </section>
+  </ion-content>
+}

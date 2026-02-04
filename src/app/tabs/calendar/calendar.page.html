@@ -1,0 +1,63 @@
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-title class="header-title">
+      <ion-icon name="calendar-outline"></ion-icon>
+      {{ 'TABS.CALENDARI' | translate }}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="calendar-page-content">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{ 'TABS.CALENDARI' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="calendar-container">
+    <ion-card>
+      <ion-card-content>
+        <div class="calendar-nav">
+          <ion-button fill="clear" (click)="prevMonth()" [disabled]="basketScheduleService.isLoading()">
+            <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
+          </ion-button>
+          <h2 class="calendar-month-label">{{ calendarMonthLabel() }}</h2>
+          <ion-button fill="clear" (click)="nextMonth()" [disabled]="basketScheduleService.isLoading()">
+            <ion-icon slot="icon-only" name="chevron-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+        @if (basketScheduleService.isLoading()) {
+          <div class="calendar-loading">
+            <ion-spinner></ion-spinner>
+          </div>
+        } @else {
+          <app-calendar-grid
+            [year]="calendarYear()"
+            [month]="calendarMonth()"
+            [loading]="basketScheduleService.isLoading()"
+            [savingDate]="savingVote()"
+            [selectedDate]="selectedDate()"
+            [preferredWeekday]="preferredWeekday()"
+            [assignmentsByDate]="assignmentsByDate()"
+            [myVotesByDate]="myVotesByDate()"
+            (dayTap)="onDayTap($event)"
+          />
+        }
+      </ion-card-content>
+    </ion-card>
+
+    @if (selectedDate(); as dateStr) {
+      <app-calendar-day-detail
+        [inline]="true"
+        [dateStr]="dateStr"
+        [dateLabel]="getDateLabel(dateStr)"
+        [assignmentName]="assignmentsByDate()[dateStr] ?? null"
+        [votes]="getVotesForDay(dateStr)"
+        [myVote]="myVotesByDate()[dateStr] ?? null"
+        [saving]="savingVote() === dateStr"
+        (close)="onDayDetailClose()"
+        (voteChange)="onDayDetailVoteChange(dateStr, $event)"
+      />
+    }
+  </div>
+</ion-content>

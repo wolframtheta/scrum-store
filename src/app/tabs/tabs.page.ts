@@ -13,7 +13,8 @@ import {
   storefrontOutline, 
   cartOutline, 
   receiptOutline, 
-  personOutline 
+  personOutline,
+  calendarOutline
 } from 'ionicons/icons';
 import { TranslateModule } from '@ngx-translate/core';
 import { CartService } from '../core/services/cart.service';
@@ -43,7 +44,8 @@ export class TabsPage implements OnInit {
       storefrontOutline,
       cartOutline,
       receiptOutline,
-      personOutline
+      personOutline,
+      calendarOutline
     });
   }
 

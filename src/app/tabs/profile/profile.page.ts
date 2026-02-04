@@ -24,8 +24,6 @@ import {
   IonAccordion,
   IonModal,
   IonButtons,
-  IonSegment,
-  IonSegmentButton,
   AlertController,
   ToastController
 } from '@ionic/angular/standalone';
@@ -81,9 +79,7 @@ import { Notice } from '../../core/models/notice.model';
     IonAccordionGroup,
     IonAccordion,
     IonModal,
-    IonButtons,
-    IonSegment,
-    IonSegmentButton
+    IonButtons
   ]
 })
 export class ProfilePage implements OnInit {
