@@ -35,7 +35,6 @@ export interface DayVote {
 export class CalendarDayDetailComponent {
   readonly dateStr = input.required<string>();
   readonly dateLabel = input.required<string>();
-  readonly assignmentName = input<string | null>(null);
   readonly votes = input<DayVote[]>([]);
   readonly myVote = input<VoteStatus | null>(null);
   readonly saving = input<boolean>(false);

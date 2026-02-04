@@ -14,15 +14,11 @@
           [class.today]="cell.isToday"
           [class.selected]="cell.dateStr === selectedDate()"
           [class.non-votable]="cell.dateStr && !isDayVotable(cell.dateStr)"
-          [class.has-assignment]="cell.dateStr && getAssignment(cell.dateStr)"
           [disabled]="!cell.dateStr || loading() || savingDate() !== null || (cell.dateStr ? !isDayVotable(cell.dateStr) : false)"
           (click)="cell.dateStr && onDayClick(cell.dateStr)"
         >
           @if (cell.dateStr) {
             <span class="calendar-day-number">{{ cell.dayOfMonth }}</span>
-            @if (getAssignment(cell.dateStr); as name) {
-              <span class="calendar-assignment">{{ name }}</span>
-            }
             @if (getMyVote(cell.dateStr); as vote) {
               <span class="calendar-vote" [attr.data-vote]="vote">
                 {{ vote === 'yes' ? ('PROFILE.CALENDAR_VOTE_YES' | translate) : vote === 'no' ? ('PROFILE.CALENDAR_VOTE_NO' | translate) : ('PROFILE.CALENDAR_VOTE_IF_NEEDED' | translate) }}

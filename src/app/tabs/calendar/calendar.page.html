@@ -38,7 +38,6 @@
             [savingDate]="savingVote()"
             [selectedDate]="selectedDate()"
             [preferredWeekday]="preferredWeekday()"
-            [assignmentsByDate]="assignmentsByDate()"
             [myVotesByDate]="myVotesByDate()"
             (dayTap)="onDayTap($event)"
           />
@@ -51,7 +50,6 @@
         [inline]="true"
         [dateStr]="dateStr"
         [dateLabel]="getDateLabel(dateStr)"
-        [assignmentName]="assignmentsByDate()[dateStr] ?? null"
         [votes]="getVotesForDay(dateStr)"
         [myVote]="myVotesByDate()[dateStr] ?? null"
         [saving]="savingVote() === dateStr"

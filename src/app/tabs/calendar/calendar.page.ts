@@ -48,16 +48,6 @@ export class CalendarPage implements OnInit {
   savingVote = signal<string | null>(null);
   selectedDate = signal<string | null>(null);
 
-  readonly assignmentsByDate = computed<Record<string, string>>(() => {
-    const cal = this.basketScheduleService.getCalendarData();
-    if (!cal) return {};
-    const out: Record<string, string> = {};
-    for (const a of cal.assignments) {
-      out[a.date] = a.assignedUserName ?? a.assignedUserEmail;
-    }
-    return out;
-  });
-
   readonly myVotesByDate = computed<Record<string, VoteStatus>>(() => {
     const cal = this.basketScheduleService.getCalendarData();
     const email = this.authService.currentUser()?.email?.toLowerCase();

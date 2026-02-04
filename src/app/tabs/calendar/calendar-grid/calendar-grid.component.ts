@@ -30,8 +30,6 @@ export class CalendarGridComponent {
   readonly selectedDate = input<string | null>(null);
   /** Preferred weekday for preparation (0=Sun..6=Sat). Null = all days votable. */
   readonly preferredWeekday = input<number | null>(null);
-  /** dateStr -> assignee name */
-  readonly assignmentsByDate = input<Record<string, string>>({});
   /** dateStr -> vote status */
   readonly myVotesByDate = input<Record<string, VoteStatus>>({});
 
@@ -82,10 +80,6 @@ export class CalendarGridComponent {
     }
     return rows;
   });
-
-  getAssignment(dateStr: string): string | null {
-    return this.assignmentsByDate()[dateStr] ?? null;
-  }
 
   getMyVote(dateStr: string): VoteStatus | null {
     return this.myVotesByDate()[dateStr] ?? null;

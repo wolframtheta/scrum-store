@@ -91,10 +91,6 @@
         color: var(--ion-color-dark);
         font-weight: 800;
       }
-      .calendar-assignment {
-        color: var(--ion-color-primary-shade);
-        opacity: 0.95;
-      }
     }
 
     &.selected {
@@ -108,31 +104,12 @@
       }
     }
 
-    &.has-assignment:not(.today) {
-      background: var(--ion-color-primary-tint);
-      border-color: var(--ion-color-primary-shade);
-      .calendar-assignment {
-        color: var(--ion-color-primary-shade);
-      }
-    }
-
     .calendar-day-number {
       font-weight: 700;
       font-size: 0.85rem;
       line-height: 1.1;
       margin-bottom: 0;
       color: var(--ion-color-dark);
-    }
-
-    .calendar-assignment {
-      font-size: 0.55rem;
-      font-weight: 600;
-      color: var(--ion-color-primary-shade);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 100%;
-      line-height: 1.1;
     }
 
     .calendar-vote {
