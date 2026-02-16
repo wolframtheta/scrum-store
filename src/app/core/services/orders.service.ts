@@ -74,4 +74,34 @@ export class OrdersService {
       this.apiService.get<Order>(`/consumer-groups/${currentGroup.id}/orders/${orderId}`)
     );
   }
+
+  async updateOrderItem(orderId: string, itemId: string, data: { quantity?: number; selectedOptions?: any[] }): Promise<Order> {
+    const currentGroup = this.consumerGroupService.currentGroup();
+    if (!currentGroup?.id) {
+      throw new Error('No consumer group selected');
+    }
+
+    const order = await firstValueFrom(
+      this.apiService.patch<Order>(`/orders/${orderId}/items/${itemId}`, data)
+    );
+
+    // Reload orders after updating
+    await this.loadOrders();
+
+    return order;
+  }
+
+  async deleteOrderItem(orderId: string, itemId: string): Promise<void> {
+    const currentGroup = this.consumerGroupService.currentGroup();
+    if (!currentGroup?.id) {
+      throw new Error('No consumer group selected');
+    }
+
+    await firstValueFrom(
+      this.apiService.delete(`/orders/${orderId}/items/${itemId}`)
+    );
+
+    // Reload orders after deleting
+    await this.loadOrders();
+  }
 }
