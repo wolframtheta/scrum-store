@@ -13,9 +13,14 @@ import {
   IonButton,
   IonLabel,
   IonBackButton,
-  IonSpinner
+  IonSpinner,
+  IonItemSliding,
+  IonItemOptions,
+  IonItemOption,
+  AlertController,
+  ToastController
 } from '@ionic/angular/standalone';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import {
   cartOutline,
@@ -24,10 +29,14 @@ import {
   cubeOutline,
   personOutline,
   calculatorOutline,
-  arrowBackOutline
+  arrowBackOutline,
+  createOutline,
+  trashOutline,
+  addOutline,
+  removeOutline
 } from 'ionicons/icons';
 import { OrdersService } from '../../core/services/orders.service';
-import { Order, PaymentStatus } from '../../core/models/order.model';
+import { Order, PaymentStatus, OrderItem } from '../../core/models/order.model';
 import { getErrorMessage } from '../../core/models/http-error.model';
 
 @Component({
@@ -50,17 +59,24 @@ import { getErrorMessage } from '../../core/models/http-error.model';
     IonButton,
     IonLabel,
     IonBackButton,
-    IonSpinner
+    IonSpinner,
+    IonItemSliding,
+    IonItemOptions,
+    IonItemOption
   ]
 })
 export class OrderDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   protected readonly router = inject(Router);
   private readonly ordersService = inject(OrdersService);
+  private readonly alertController = inject(AlertController);
+  private readonly toastController = inject(ToastController);
+  private readonly translate = inject(TranslateService);
 
   order = signal<Order | null>(null);
   isLoading = signal(true);
   error = signal<string | null>(null);
+  updatingItemId = signal<string | null>(null);
 
   readonly PaymentStatus = PaymentStatus;
 
@@ -72,7 +88,11 @@ export class OrderDetailPage implements OnInit {
       cubeOutline,
       personOutline,
       calculatorOutline,
-      arrowBackOutline
+      arrowBackOutline,
+      createOutline,
+      trashOutline,
+      addOutline,
+      removeOutline
     });
   }
 
@@ -213,5 +233,208 @@ export class OrderDetailPage implements OnInit {
     if (!order) return false;
     const paidAmount = typeof order.paidAmount === 'string' ? parseFloat(order.paidAmount) : (order.paidAmount || 0);
     return paidAmount > 0;
+  }
+
+  canEditOrder(): boolean {
+    const currentOrder = this.order();
+    if (!currentOrder) return false;
+    return currentOrder.paymentStatus !== PaymentStatus.PAID;
+  }
+
+  private toDateStr(d: Date | string): string {
+    const date = typeof d === 'string' ? new Date(d) : d;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  isPeriodExpired(item: OrderItem): boolean {
+    const endDate = item.period?.endDate;
+    if (!endDate) return false;
+    const todayStr = this.toDateStr(new Date());
+    const endStr = this.toDateStr(endDate);
+    return todayStr > endStr;
+  }
+
+  canEditItem(item: OrderItem): boolean {
+    return this.canEditOrder() && !this.isPeriodExpired(item);
+  }
+
+  isUpdatingItem(itemId: string | undefined): boolean {
+    return !!itemId && this.updatingItemId() === itemId;
+  }
+
+  // Quantity step based on unit measure (same as cart)
+  getQuantityStep(item: OrderItem): number {
+    return item.article?.unitMeasure === 'kg' ? 0.5 : 1;
+  }
+
+  async increaseQuantity(item: OrderItem) {
+    if (!item.id || !this.order()?.id || !this.canEditItem(item) || this.isUpdatingItem(item.id)) return;
+
+    const currentQuantity = typeof item.quantity === 'string' ? parseFloat(item.quantity) : item.quantity;
+    const step = this.getQuantityStep(item);
+    const newQuantity = Number((currentQuantity + step).toFixed(3));
+
+    this.applyQuantityOptimistic(item, newQuantity);
+    this.updateQuantityBackend(item, newQuantity);
+  }
+
+  async decreaseQuantity(item: OrderItem) {
+    if (!item.id || !this.order()?.id || !this.canEditItem(item) || this.isUpdatingItem(item.id)) return;
+
+    const currentQuantity = typeof item.quantity === 'string' ? parseFloat(item.quantity) : item.quantity;
+    const step = this.getQuantityStep(item);
+    const newQuantity = Number((currentQuantity - step).toFixed(3));
+
+    if (newQuantity <= 0) {
+      await this.removeItem(item);
+      return;
+    }
+
+    this.applyQuantityOptimistic(item, newQuantity);
+    this.updateQuantityBackend(item, newQuantity);
+  }
+
+  private applyQuantityOptimistic(item: OrderItem, newQuantity: number) {
+    const order = this.order();
+    if (!order) return;
+
+    const updatedItems = order.items.map(i =>
+      i.id === item.id ? { ...i, quantity: newQuantity } : i
+    );
+    this.order.set({ ...order, items: updatedItems });
+  }
+
+  private async updateQuantityBackend(item: OrderItem, newQuantity: number) {
+    if (!item.id || !this.order()?.id) return;
+
+    this.updatingItemId.set(item.id);
+    try {
+      const updatedOrder = await this.ordersService.updateOrderItem(
+        this.order()!.id,
+        item.id,
+        { quantity: newQuantity }
+      );
+      this.order.set(updatedOrder);
+      await this.showToast(this.translate.instant('CART.ITEM_UPDATED') || 'Quantitat actualitzada', 'success');
+    } catch (err) {
+      console.error('Error updating quantity:', err);
+      this.applyQuantityOptimistic(item, item.quantity);
+      await this.showToast(getErrorMessage(err, 'Error actualitzant la quantitat'), 'danger');
+    } finally {
+      this.updatingItemId.set(null);
+    }
+  }
+
+  async removeItem(item: OrderItem) {
+    if (!item.id || !this.order()?.id || !this.canEditItem(item)) return;
+
+    this.updatingItemId.set(item.id);
+    try {
+      await this.ordersService.deleteOrderItem(this.order()!.id, item.id);
+      
+      // Reload the order
+      const updatedOrder = await this.ordersService.getOrderById(this.order()!.id);
+      
+      // If no items left, go back to orders list
+      if (!updatedOrder.items || updatedOrder.items.length === 0) {
+        await this.showToast(this.translate.instant('CART.ITEM_REMOVED') || 'Article eliminat', 'success');
+        this.router.navigate(['/tabs/orders']);
+      } else {
+        this.order.set(updatedOrder);
+        await this.showToast(this.translate.instant('CART.ITEM_REMOVED') || 'Article eliminat', 'success');
+      }
+    } catch (err) {
+      console.error('Error deleting item:', err);
+      await this.showToast(getErrorMessage(err, 'Error eliminant l\'article'), 'danger');
+    } finally {
+      this.updatingItemId.set(null);
+    }
+  }
+
+  async openCustomizationDialog(item: OrderItem) {
+    if (!item.id || !this.order()?.id || !item.selectedOptions || !this.canEditItem(item)) return;
+
+    const alert = await this.alertController.create({
+      header: 'Personalitzacions',
+      message: 'Edita les opcions seleccionades:',
+      inputs: item.selectedOptions.map(option => {
+        if (option.type === 'boolean') {
+          return {
+            type: 'checkbox' as const,
+            label: option.title + (option.price ? ` (+${this.formatPrice(option.price)})` : ''),
+            value: option.optionId,
+            checked: option.value as boolean
+          };
+        }
+        return {
+          type: 'text' as const,
+          name: option.optionId,
+          placeholder: option.title,
+          value: option.type === 'multiselect' ? (option.value as string[]).join(', ') : String(option.value)
+        };
+      }),
+      buttons: [
+        {
+          text: 'Cancel·lar',
+          role: 'cancel'
+        },
+        {
+          text: 'Guardar',
+          handler: (data) => this.saveCustomizations(item, data)
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async saveCustomizations(item: OrderItem, data: any) {
+    if (!item.id || !this.order()?.id || !item.selectedOptions) return;
+
+    try {
+      const updatedOptions = item.selectedOptions.map(option => {
+        if (option.type === 'boolean') {
+          return {
+            ...option,
+            value: Array.isArray(data) ? data.includes(option.optionId) : false
+          };
+        }
+        const newValue = data[option.optionId];
+        if (option.type === 'multiselect' && typeof newValue === 'string') {
+          return {
+            ...option,
+            value: newValue.split(',').map(v => v.trim()).filter(v => v)
+          };
+        }
+        return {
+          ...option,
+          value: newValue
+        };
+      });
+
+      const updatedOrder = await this.ordersService.updateOrderItem(
+        this.order()!.id,
+        item.id,
+        { selectedOptions: updatedOptions }
+      );
+      this.order.set(updatedOrder);
+      await this.showToast('Personalitzacions actualitzades', 'success');
+    } catch (err) {
+      console.error('Error updating customizations:', err);
+      await this.showToast(getErrorMessage(err, 'Error actualitzant les personalitzacions'), 'danger');
+    }
+  }
+
+  async showToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      position: 'top',
+      color
+    });
+    await toast.present();
   }
 }

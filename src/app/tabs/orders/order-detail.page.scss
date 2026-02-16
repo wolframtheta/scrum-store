@@ -77,7 +77,7 @@
     margin: 0 0 1rem 0;
   }
 
-  .item-card {
+    .item-card {
     background: white;
     border-radius: 16px;
     margin-bottom: 1rem;
@@ -257,6 +257,55 @@
             ion-icon, .label {
               color: #7C3AED;
             }
+
+            // Quantity controls (same as cart)
+            .quantity-controls {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+
+              .quantity-btn {
+                --border-radius: 8px;
+                --padding-start: 0.5rem;
+                --padding-end: 0.5rem;
+                height: 32px;
+                width: 32px;
+                --border-width: 2px;
+                --border-color: #7C3AED;
+
+                ion-icon {
+                  font-size: 1.125rem;
+                  color: #7C3AED;
+                }
+              }
+
+              .quantity-display {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+                min-width: 60px;
+                justify-content: center;
+
+                .quantity-spinner {
+                  width: 20px;
+                  height: 20px;
+                  --color: #7C3AED;
+                }
+
+                .quantity-value {
+                  font-size: 1.25rem;
+                  font-weight: 800;
+                  color: var(--ion-color-dark);
+                }
+
+                .quantity-unit {
+                  font-size: 0.875rem;
+                  font-weight: 600;
+                  color: var(--ion-color-medium);
+                  text-transform: uppercase;
+                }
+              }
+            }
           }
 
           &.subtotal {
@@ -306,6 +355,19 @@
         background: rgba(var(--ion-color-light-rgb), 0.5);
         border-radius: 8px;
         border-left: 3px solid var(--ion-color-primary);
+
+        .customization-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.5rem;
+
+          strong {
+            color: var(--ion-color-dark);
+            font-weight: 600;
+            font-size: 0.875rem;
+          }
+        }
 
         .customization-option {
           display: flex;

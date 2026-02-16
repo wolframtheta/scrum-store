@@ -40,88 +40,132 @@
     <div class="items-section">
       <h3 class="section-title">{{ 'PROFILE.ORDER_ITEMS' | translate }} ({{ order()!.items.length }})</h3>
 
-      <ion-card *ngFor="let item of order()!.items" class="item-card">
-        <div class="item-detail">
-          <div class="item-main">
-            <div class="item-image" *ngIf="item.article?.image">
-              <img [src]="item.article.image" [alt]="item.article.product || item.article.name">
-            </div>
-            <div class="item-image placeholder" *ngIf="!item.article?.image">
-              <ion-icon name="cart-outline"></ion-icon>
-            </div>
-
-            <div class="item-info">
-              <div class="item-title">
-                <span class="item-category">{{ item.article?.category || '' }}</span>
-                <h4>{{ item.article?.product || ('PROFILE.ARTICLE' | translate) }}</h4>
-                <p *ngIf="item.article?.variety" class="item-variety">{{ item.article.variety }}</p>
+      <ion-item-sliding *ngFor="let item of order()!.items">
+        <ion-card class="item-card">
+          <div class="item-detail">
+            <div class="item-main">
+              <div class="item-image" *ngIf="item.article?.image">
+                <img [src]="item.article.image" [alt]="item.article.product || item.article.name">
               </div>
-              <ion-badge *ngIf="item.article?.isSeasonal" color="success" class="seasonal-badge-small">
-                <ion-icon name="leaf-outline"></ion-icon>
-              </ion-badge>
-            </div>
-          </div>
+              <div class="item-image placeholder" *ngIf="!item.article?.image">
+                <ion-icon name="cart-outline"></ion-icon>
+              </div>
 
-          <div class="producer-info" *ngIf="item.article?.producerName">
+              <div class="item-info">
+                <div class="item-title">
+                  <span class="item-category">{{ item.article?.category || '' }}</span>
+                  <h4>{{ item.article?.product || ('PROFILE.ARTICLE' | translate) }}</h4>
+                  <p *ngIf="item.article?.variety" class="item-variety">{{ item.article.variety }}</p>
+                </div>
+                <ion-badge *ngIf="item.article?.isSeasonal" color="success" class="seasonal-badge-small">
+                  <ion-icon name="leaf-outline"></ion-icon>
+                </ion-badge>
+              </div>
+            </div>
+
+            <div class="producer-info" *ngIf="item.article?.producerName">
             <ion-icon name="person-outline"></ion-icon>
             <span>{{ item.article.producerName }}</span>
             <span *ngIf="item.article?.city" class="city">· {{ item.article.city }}</span>
+            </div>
+
+            <div *ngIf="item.selectedOptions && item.selectedOptions.length > 0" class="customization-options">
+              <div class="customization-header">
+                <strong>Personalitzacions:</strong>
+                <ion-button *ngIf="canEditItem(item)" fill="clear" size="small" (click)="openCustomizationDialog(item)">
+                  <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                </ion-button>
+              </div>
+              <div *ngFor="let option of item.selectedOptions" class="customization-option">
+                <strong>{{ option.title }}:</strong>
+                <span *ngIf="option.type === 'boolean'">{{ option.value ? 'Sí' : 'No' }}</span>
+                <span *ngIf="option.type !== 'boolean' && option.type !== 'multiselect'">{{ option.value }}</span>
+                <span *ngIf="option.type === 'multiselect'">{{ formatMultiselectValue(option.value) }}</span>
+                <span *ngIf="option.price && option.price > 0" class="option-price">(+{{ formatPrice(option.price) }})</span>
+              </div>
+            </div>
+
+            <div class="item-pricing">
+              <div class="pricing-row price-unit">
+                <div class="label-group">
+                  <ion-icon name="pricetag-outline"></ion-icon>
+                  <span class="label">{{ 'PROFILE.PRICE_PER_UNIT' | translate }}</span>
+                </div>
+                <span class="value">{{ formatPrice(item.pricePerUnit) }}/{{ item.article?.unitMeasure || 'ud' }}</span>
+              </div>
+
+              <div class="pricing-row quantity">
+                <div class="label-group">
+                  <ion-icon name="cube-outline"></ion-icon>
+                  <span class="label">{{ 'PROFILE.QUANTITY' | translate }}</span>
+                </div>
+
+                <!-- Quantity controls (same as cart) -->
+                <div class="quantity-controls" *ngIf="canEditItem(item)">
+                  <ion-button 
+                    fill="outline" 
+                    size="small" 
+                    (click)="decreaseQuantity(item)"
+                    [disabled]="isUpdatingItem(item.id)"
+                    class="quantity-btn">
+                    <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+                  </ion-button>
+
+                  <div class="quantity-display">
+                    <ion-spinner *ngIf="isUpdatingItem(item.id)" name="crescent" class="quantity-spinner"></ion-spinner>
+                    <span class="quantity-value" *ngIf="!isUpdatingItem(item.id)">{{ formatQuantity(item.quantity) }}</span>
+                    <span class="quantity-unit">{{ item.article?.unitMeasure || 'ud' }}</span>
+                  </div>
+
+                  <ion-button 
+                    fill="outline" 
+                    size="small" 
+                    (click)="increaseQuantity(item)"
+                    [disabled]="isUpdatingItem(item.id)"
+                    class="quantity-btn">
+                    <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+                  </ion-button>
+                </div>
+
+                <!-- Read-only quantity display -->
+                <span class="value-quantity" *ngIf="!canEditItem(item)">
+                  <span class="number">{{ formatQuantity(item.quantity) }}</span>
+                  <span class="unit">{{ item.article?.unitMeasure || 'ud' }}</span>
+                </span>
+              </div>
+
+              <div class="pricing-row subtotal">
+                <div class="label-group">
+                  <ion-icon name="calculator-outline"></ion-icon>
+                  <span class="label">{{ 'PROFILE.SUBTOTAL' | translate }}</span>
+                </div>
+                <span class="value">{{ formatPrice(item.totalPrice) }}</span>
+              </div>
+
+              <div class="pricing-row tax" *ngIf="item.article?.taxRate && (item.article?.taxRate ?? 0) > 0">
+                <div class="label-group">
+                  <span class="label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ item.article?.taxRate }}%)</span>
+                </div>
+                <span class="value">{{ formatPrice((item.totalPrice || 0) * ((item.article?.taxRate || 0) / 100)) }}</span>
+              </div>
+
+              <div class="pricing-row total">
+                <div class="label-group">
+                  <span class="label">{{ 'CART.TOTAL' | translate }}</span>
+                </div>
+                <span class="value-total">{{ formatPrice(getItemTotalWithTax(item)) }}</span>
+              </div>
+            </div>
           </div>
+        </ion-card>
 
-          <div *ngIf="item.selectedOptions && item.selectedOptions.length > 0" class="customization-options">
-            <div *ngFor="let option of item.selectedOptions" class="customization-option">
-              <strong>{{ option.title }}:</strong>
-              <span *ngIf="option.type === 'boolean'">{{ option.value ? 'Sí' : 'No' }}</span>
-              <span *ngIf="option.type !== 'boolean' && option.type !== 'multiselect'">{{ option.value }}</span>
-              <span *ngIf="option.type === 'multiselect'">{{ formatMultiselectValue(option.value) }}</span>
-              <span *ngIf="option.price && option.price > 0" class="option-price">(+{{ formatPrice(option.price) }})</span>
-            </div>
-          </div>
-
-          <div class="item-pricing">
-            <div class="pricing-row price-unit">
-              <div class="label-group">
-                <ion-icon name="pricetag-outline"></ion-icon>
-                <span class="label">{{ 'PROFILE.PRICE_PER_UNIT' | translate }}</span>
-              </div>
-              <span class="value">{{ formatPrice(item.pricePerUnit) }}/{{ item.article?.unitMeasure || 'ud' }}</span>
-            </div>
-
-            <div class="pricing-row quantity">
-              <div class="label-group">
-                <ion-icon name="cube-outline"></ion-icon>
-                <span class="label">{{ 'PROFILE.QUANTITY' | translate }}</span>
-              </div>
-              <span class="value-quantity">
-                <span class="number">{{ formatQuantity(item.quantity) }}</span>
-                <span class="unit">{{ item.article?.unitMeasure || 'ud' }}</span>
-              </span>
-            </div>
-
-            <div class="pricing-row subtotal">
-              <div class="label-group">
-                <ion-icon name="calculator-outline"></ion-icon>
-                <span class="label">{{ 'PROFILE.SUBTOTAL' | translate }}</span>
-              </div>
-              <span class="value">{{ formatPrice(item.totalPrice) }}</span>
-            </div>
-
-            <div class="pricing-row tax" *ngIf="item.article?.taxRate && (item.article?.taxRate ?? 0) > 0">
-              <div class="label-group">
-                <span class="label">{{ 'CART.TAX_AMOUNT' | translate }} ({{ item.article?.taxRate }}%)</span>
-              </div>
-              <span class="value">{{ formatPrice((item.totalPrice || 0) * ((item.article?.taxRate || 0) / 100)) }}</span>
-            </div>
-
-            <div class="pricing-row total">
-              <div class="label-group">
-                <span class="label">{{ 'CART.TOTAL' | translate }}</span>
-              </div>
-              <span class="value-total">{{ formatPrice(getItemTotalWithTax(item)) }}</span>
-            </div>
-          </div>
-        </div>
-      </ion-card>
+        <!-- Swipe to delete (same as cart) -->
+        <ion-item-options side="end" *ngIf="canEditItem(item)">
+          <ion-item-option color="danger" (click)="removeItem(item)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
     </div>
   </div>
 
