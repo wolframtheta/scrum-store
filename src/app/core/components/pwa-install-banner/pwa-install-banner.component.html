@@ -1,0 +1,41 @@
+@if (showBanner()) {
+  <ion-card class="pwa-banner" [@slideDown]>
+    <ion-card-content>
+      <div class="banner-content">
+        <div class="banner-icon">
+          <img src="assets/icon/icon-192x192.png" alt="App icon" />
+        </div>
+        
+        <div class="banner-text">
+          <h3>{{ 'PWA.INSTALL_TITLE' | translate }}</h3>
+          <p>{{ 'PWA.INSTALL_DESCRIPTION' | translate }}</p>
+          
+          @if (isIOS()) {
+            <div class="ios-instructions">
+              <div class="ios-step">
+                <ion-icon name="share-outline"></ion-icon>
+                <span>{{ 'PWA.IOS_STEP1' | translate }}</span>
+              </div>
+              <div class="ios-step">
+                <ion-icon name="add-circle-outline"></ion-icon>
+                <span>{{ 'PWA.IOS_STEP2' | translate }}</span>
+              </div>
+            </div>
+          }
+        </div>
+        
+        <div class="banner-actions">
+          @if (isAndroid()) {
+            <ion-button color="secondary" class="btn-small" (click)="installPWA()">
+              {{ 'PWA.INSTALL_BUTTON' | translate }}
+            </ion-button>
+          }
+          
+          <ion-button fill="clear" (click)="dismiss()">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+}
