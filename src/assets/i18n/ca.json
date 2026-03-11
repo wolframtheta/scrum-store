@@ -189,6 +189,14 @@
     "ORIGIN": "Origen",
     "CITY": "Ciutat",
     "AVAILABILITY": "Disponibilitat"
+  },
+  "PWA": {
+    "INSTALL_TITLE": "Instal·la l'aplicació",
+    "INSTALL_DESCRIPTION": "Accedeix més ràpid des de la pantalla d'inici",
+    "INSTALL_BUTTON": "Instal·lar",
+    "IOS_STEP1": "Prem la icona de Compartir",
+    "IOS_STEP2": "Selecciona \"Afegir a la pantalla d'inici\"",
+    "DISMISS": "Ara no"
   }
 }
 

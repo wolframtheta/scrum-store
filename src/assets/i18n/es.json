@@ -187,6 +187,14 @@
     "DESCRIPTION": "Descripción",
     "ORIGIN": "Origen",
     "AVAILABILITY": "Disponibilidad"
+  },
+  "PWA": {
+    "INSTALL_TITLE": "Instala la aplicación",
+    "INSTALL_DESCRIPTION": "Accede más rápido desde la pantalla de inicio",
+    "INSTALL_BUTTON": "Instalar",
+    "IOS_STEP1": "Pulsa el icono de Compartir",
+    "IOS_STEP2": "Selecciona \"Añadir a pantalla de inicio\"",
+    "DISMISS": "Ahora no"
   }
 }
 
