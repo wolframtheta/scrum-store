@@ -5,9 +5,10 @@
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
+    "set-env": "node scripts/set-env.js",
     "start": "ionic serve --configuration=development",
     "start:prod": "ionic serve --configuration=production",
-    "build": "ng build",
+    "build": "npm run set-env && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
