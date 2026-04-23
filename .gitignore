@@ -34,10 +34,14 @@ log.txt
 npm-debug.log
 yarn-error.log
 
-# Environment files
+# Environment files - NEVER commit .env files with sensitive data
 .env
 .env.*
 !.env.example
+
+# Auto-generated environment files
+/src/environments/environment.ts
+/src/environments/environment.*.ts
 
 # IDEs and editors
 .idea/

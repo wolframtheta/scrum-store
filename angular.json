@@ -58,10 +58,20 @@
                   "maximumError": "5mb"
                 }
               ],
-              "fileReplacements": [
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
+            },
+            "pre": {
+              "budgets": [
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
                 }
               ],
               "outputHashing": "all",
@@ -71,13 +81,7 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.local.ts"
-                }
-              ]
+              "namedChunks": true
             },
             "ci": {
               "progress": false
@@ -90,6 +94,9 @@
           "configurations": {
             "production": {
               "buildTarget": "app:build:production"
+            },
+            "pre": {
+              "buildTarget": "app:build:pre"
             },
             "development": {
               "buildTarget": "app:build:development"
