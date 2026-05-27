@@ -75,6 +75,7 @@
     "TAX_BREAKDOWN": "Desglossament per tipus d'IVA",
     "TOTAL": "Total",
     "CONFIRM_ORDER": "Tramitar comanda",
+    "PROCESSING_ORDER": "Processant...",
     "ITEM_REMOVED": "Article eliminat de la cistella",
     "EMPTY_CART": "La cistella està buida",
     "CONFIRM_ORDER_TITLE": "Confirmar comanda",

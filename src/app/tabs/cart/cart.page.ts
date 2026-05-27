@@ -58,6 +58,7 @@ export class CartPage implements OnInit {
   totalPriceWithoutTax = this.cartService.totalPriceWithoutTax;
   totalTaxAmount = this.cartService.totalTaxAmount;
   taxSummary = this.cartService.taxSummary;
+  isProcessingOrder = false;
 
   constructor(
     private cartService: CartService,
@@ -139,6 +140,10 @@ export class CartPage implements OnInit {
   }
 
   async confirmOrder() {
+    if (this.isProcessingOrder) {
+      return;
+    }
+
     if (this.items().length === 0) {
       await this.showToast(this.translate.instant('CART.EMPTY_CART'), 'warning');
       return;
@@ -175,6 +180,12 @@ export class CartPage implements OnInit {
   }
 
   async processOrder() {
+    if (this.isProcessingOrder) {
+      return;
+    }
+
+    this.isProcessingOrder = true;
+    
     try {
       // Create order from cart items
       await this.ordersService.createOrder(this.items());
@@ -187,6 +198,8 @@ export class CartPage implements OnInit {
       console.error('Error processing order:', error);
       const msg = getErrorMessage(error, this.translate.instant('COMMON.ERROR'));
       await this.showToast(msg, 'danger');
+    } finally {
+      this.isProcessingOrder = false;
     }
   }
 

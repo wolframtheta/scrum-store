@@ -155,9 +155,10 @@
         expand="block" 
         color="secondary" 
         size="large"
+        [disabled]="isProcessingOrder"
         (click)="confirmOrder()">
         <ion-icon slot="start" name="checkmark-outline"></ion-icon>
-        {{ 'CART.CONFIRM_ORDER' | translate }}
+        {{ isProcessingOrder ? ('CART.PROCESSING_ORDER' | translate) : ('CART.CONFIRM_ORDER' | translate) }}
       </ion-button>
     </div>
   </ion-toolbar>
